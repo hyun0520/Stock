@@ -45,7 +45,7 @@
   display: flex;
   gap: 28px;
   font-size: 20px;
-  margin: 0 auto;              /* 🔥 완전 중앙 */
+  margin: 0 auto;              
 }
 
 .header-menu span {
@@ -283,8 +283,37 @@
   transform: translateY(-1px);
 }
 
-/* small hint state rows (like "검색어를 입력하세요") */
-.result-item:has(*) {
-  /* no-op: kept for modern browsers, safe */
+
+/* ====== PRICE COLOR ======== */
+
+.price-down {
+  color: #3b82f6;          
+  font-weight: 700;
+  text-align: right;
 }
 
+.price-up {
+  color: #ef4444;           
+  font-weight: 700;
+  text-align: right;
+}
+
+/* 키보드 선택 강조 */
+.result-item.active {
+  background: rgba(255,138,0,0.25);
+  border: 1px solid rgba(255,138,0,0.45);
+}
+
+/* ❌ 최근 검색 삭제 버튼 */
+.recent-remove-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.recent-remove-btn:hover {
+  color: #ef4444;
+}
