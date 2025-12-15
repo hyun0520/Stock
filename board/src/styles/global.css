@@ -1,0 +1,516 @@
+/* ===== Reset ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f5f6fa;
+  color: #222;
+}
+
+/* ===== Layout ===== */
+.page {
+  padding: 40px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+/* ===== Buttons ===== */
+button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+button.primary {
+  background: #ff7f00;
+  color: black;
+  font-weight: bold;
+}
+
+button.danger {
+  background: #ff4d4f;
+  color: white;
+}
+
+/* ===== Inputs ===== */
+input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+/* ===== Text ===== */
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #666;
+}
+/*====== login =====*/
+
+
+/* 전체 페이지 중앙 정렬 */
+.login-page {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #ffffff;
+}
+
+/* 카드 */
+.login-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 40px 32px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+/* 타이틀 */
+.login-title {
+  font-size: 34px;
+  font-weight: 700;
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+/* 라벨 */
+.login-card label {
+  font-size: 14px;
+  color: #444;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* 인풋 */
+.login-card input {
+  width: 100%;
+  padding: 14px 12px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #d0d7de;
+  font-size: 15px;
+}
+
+.login-card input:focus {
+  outline: none;
+  border-color: #ff7f00;
+}
+
+/* 비밀번호 라인 */
+.password-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.forgot {
+  font-size: 13px;
+  color: #ff7f00;
+  cursor: pointer;
+  font-weight: 650;
+}
+
+/* 로그인 버튼 */
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: #ff7f00 ;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* 에러 메시지 */
+.login-msg {
+  margin-top: 14px;
+  color: #e74c3c;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* 하단 링크 */
+.login-footer {
+  margin-top: 28px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.login-footer a {
+  color: #ff7f00;
+  font-weight: 600;
+  text-decoration: none;
+}
+/*======= Stock Detail =========*/
+/* ===== Modal Overlay ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+/* ===== Modal Box ===== */
+.modal-box {
+  width: 360px;
+  background: #0b0e11;
+  border-radius: 14px;
+  padding: 24px;
+  color: white;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+.modal-box h3 {
+  margin-bottom: 20px;
+}
+
+/* ===== Fields ===== */
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.modal-field label {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #9aa4b2;
+}
+
+.modal-field input {
+  height: 42px;
+  border-radius: 8px;
+  border: none;
+  padding: 0 12px;
+  background: #1f2937;
+  color: white;
+  font-size: 14px;
+}
+
+/* ===== Actions ===== */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-btn {
+  background: #374151;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.confirm-btn {
+  background: #ff8a00;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ===== Message ===== */
+.modal-msg {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #22c55e;
+}
+
+/*=======register=========*/
+
+.register-page {
+  min-height: 100vh;
+  background: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* X 버튼 */
+.register-close {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  font-size: 28px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* 중앙 로고 */
+.register-logo {
+  margin-top: 24px;
+  cursor: pointer;
+}
+
+.register-logo img {
+  height: 100px; 
+  width: auto;
+}
+
+/* 폼 카드 */
+.register-card {
+  width: 100%;
+  max-width: 420px;
+  margin-top: 120px;
+  text-align: center;
+}
+
+.register-title {
+  font-size: 30px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.register-card label {
+  display: block;
+  text-align: left;
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+.register-card input,
+.birth-select select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.birth-select {
+  display: flex;
+  gap: 8px;
+}
+
+.register-btn {
+  width: 100%;
+  padding: 14px;
+  background: #ff7f00;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.register-footer {
+  margin-top: 32px;
+  font-size: 14px;
+}
+
+.register-footer a {
+  color: #ff7f00;
+  font-weight: 600;
+}
+/* 회원가입 에러 메시지 */
+
+.msg-success {
+  color: #2ecc71;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.msg-error {
+  color: #e74c3c;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.register-msg {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #e74c3c; 
+  font-weight: 500;
+  text-align: center;
+  font-family: inherit;
+}
+
+.register-msg::before {
+  content: "⚠ ";
+}
+/* ===== Portfolio ===== */
+
+.profit {
+  font-weight: 700;
+}
+
+.profit.plus {
+  color: #22c55e;
+}
+
+.profit.minus {
+  color: #ef4444;
+}
+
+.portfolio-card .value {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+.portfolio-wrap {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.portfolio-card {
+  background: #111827;
+  color: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.portfolio-card .left p {
+  color: #9aa4b2;
+  font-size: 14px;
+}
+
+.portfolio-card .right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.portfolio-card button {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.edit-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.delete-btn {
+  background: #dc2626;
+  color: white;
+}
+
+.edit-box {
+  display: flex;
+  gap: 8px;
+}
+
+.edit-box input {
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+  width: 90px;
+}
+
+.save-btn {
+  background: #22c55e;
+  color: white;
+}
+
+.cancel-btn {
+  background: #6b7280;
+  color: white;
+}
+
+/* ===============================
+   Portfolio Summary (가로 요약 카드)
+================================ */
+
+/* ===== Portfolio Summary ===== */
+.portfolio-summary {
+  display: flex;
+  gap: 32px;
+  margin: 20px 0 30px;
+  padding: 20px 24px;
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  align-items: center;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-item .label {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.summary-item strong {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* 손익 강조 */
+.summary-profit {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-profit strong {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+/* 🔴 수익 플러스 (국내 증권앱 스타일) */
+.summary-profit.plus strong {
+  color: #dc2626;
+}
+
+/* 🔵 손실 마이너스 */
+.summary-profit.minus strong {
+  color: #2563eb;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .portfolio-summary.horizontal {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}

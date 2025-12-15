@@ -1,0 +1,290 @@
+/* ================= Variables ================= */
+:root {
+  --bg-header-top: #0b0e11;
+  --bg-header-bottom: #0f141c;
+  --bg-dark: #1a2230;
+
+  --accent: #ff8a00;
+  --accent-hover: #ff9b1a;
+
+  --text-muted: #cbd5e1;
+
+  --radius-lg: 18px;
+  --radius-md: 12px;
+
+  --shadow-soft: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+/* ================= HEADER ================= */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  background: linear-gradient(
+    180deg,
+    var(--bg-header-top),
+    var(--bg-header-bottom)
+  );
+  color: white;
+}
+
+/* ================= Logo ================= */
+.header-left {
+  width: 280px;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 48px;
+  cursor: pointer;
+}
+
+/* ================= Menu (CENTER) ================= */
+.header-menu {
+  display: flex;
+  gap: 28px;
+  font-size: 20px;
+  margin: 0 auto;              /* 🔥 완전 중앙 */
+}
+
+.header-menu span {
+  position: relative;
+  padding: 4px 2px;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.header-menu span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0%;
+  height: 2px;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+
+.header-menu span:hover {
+  color: white;
+}
+
+.header-menu span:hover::after {
+  width: 100%;
+}
+
+/* ================= Right ================= */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 🔍 Icon Button */
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: #1f2937;
+  color: white;
+  border: none;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: var(--shadow-soft);
+  transition: background 0.2s ease, transform 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: #2b3646;
+  transform: translateY(-2px);
+}
+
+/* Buttons */
+.header-right button {
+  min-width: 100px;
+  height: 44px;
+  padding: 0 18px;
+
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.login-btn {
+  background: #1f2937;
+  color: white;
+  border: none;
+}
+
+.login-btn:hover {
+  background: #2b3646;
+  transform: translateY(-2px);
+}
+
+.signup-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+}
+
+.signup-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+
+/* ================= SEARCH MODAL UI (ADD ONLY) ================= */
+
+/* dim overlay */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(2px);
+  z-index: 900;
+}
+
+/* modal wrapper (centered, floating) */
+.search-modal {
+  position: fixed;
+  left: 50%;
+  top: 90px;
+  transform: translateX(-50%);
+  width: min(800px, 92vw);
+  z-index: 1000;
+  animation: searchPop 0.22s ease;
+}
+
+@keyframes searchPop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+/* input box */
+.search-modal-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 12px 18px;
+
+  border-radius: var(--radius-lg);
+
+  background: linear-gradient(
+    180deg,
+    rgba(11,14,17,0.92),
+    rgba(15,20,28,0.92)
+  );
+
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 30px 90px rgba(0,0,0,0.75);
+}
+
+
+
+/* field */
+.search-modal-field {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.search-modal-field::placeholder {
+  color: rgba(203,213,225,0.55);
+  font-weight: 500;
+}
+
+/* focus glow */
+.search-modal-input:focus-within {
+  border-color: rgba(255,138,0,0.55);
+  box-shadow:
+    0 0 0 3px rgba(255,138,0,0.18),
+    0 30px 90px rgba(0,0,0,0.75);
+}
+
+.search-modal-input:focus-within .search-modal-icon {
+  color: var(--accent);
+}
+
+/* dropdown panel */
+.search-panel {
+  margin-top: 12px;
+  padding: 10px;
+
+  border-radius: var(--radius-lg);
+  background: rgba(11,14,17,0.92);
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow: 0 24px 70px rgba(0,0,0,0.7);
+  max-height: min(420px, 55vh);
+  overflow: auto;
+}
+
+/* prettier scrollbar (optional) */
+.search-panel::-webkit-scrollbar {
+  width: 10px;
+}
+.search-panel::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+}
+.search-panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* results */
+.result-item {
+  padding: 12px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+
+  color: rgba(255,255,255,0.9);
+  font-size: 14px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  transition: background 0.18s ease, transform 0.12s ease;
+}
+
+.result-item + .result-item {
+  margin-top: 6px;
+}
+
+.result-item:hover {
+  background: rgba(31,41,55,0.9);
+  transform: translateY(-1px);
+}
+
+/* small hint state rows (like "검색어를 입력하세요") */
+.result-item:has(*) {
+  /* no-op: kept for modern browsers, safe */
+}
+
