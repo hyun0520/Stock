@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./Watchlist.css"; // 🔥 애니메이션 CSS
+import "./Watchlist.css";
+
+const USD_TO_KRW = 1474;
 
 export default function Watchlist() {
   const [list, setList] = useState([]);
   const [prices, setPrices] = useState({});
+  const [rateMap, setRateMap] = useState({});
   const [prevPrices, setPrevPrices] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -13,7 +16,7 @@ export default function Watchlist() {
   const navigate = useNavigate();
 
   /* ===============================
-     관심종목 불러오기
+     ⭐ 관심종목 불러오기
   =============================== */
   const fetchWatchlist = async () => {
     const res = await axios.get(
@@ -25,38 +28,67 @@ export default function Watchlist() {
   };
 
   /* ===============================
-     현재가 불러오기 (주식 + 코인)
+     💰 현재가 + 등락률
   =============================== */
   const fetchPrices = async (items) => {
-    const priceMap = {};
+    const priceTemp = {};
+    const rateTemp = {};
     const oldPrices = { ...prices };
 
     await Promise.all(
       items.map(async (item) => {
         try {
+          /* ================= CRYPTO ================= */
           if (item.market === "CRYPTO") {
             const res = await axios.get(
-              `http://localhost:5000/api/crypto/price/${item.symbol}`
+              "http://localhost:5000/api/search/price",
+              {
+                params: {
+                  type: "CRYPTO",
+                  symbol: item.symbol
+                }
+              }
             );
-            priceMap[item.symbol] = res.data.price;
-          } else {
+
+            priceTemp[item.symbol] = res.data.price;
+            rateTemp[item.symbol] = res.data.changeRate ?? null;
+          }
+
+          /* ================= US ================= */
+          else if (item.market === "US") {
+            const res = await axios.get(
+              `http://localhost:5000/api/usStock/${item.symbol}`
+            );
+
+            const krw = Math.round(res.data.price * USD_TO_KRW);
+            priceTemp[item.symbol] = krw;
+            rateTemp[item.symbol] = res.data.rate;
+          }
+
+          /* ================= KOREA ================= */
+          else {
             const res = await axios.get(
               `http://localhost:5000/api/stock/korea/${item.symbol}`
             );
-            priceMap[item.symbol] = res.data.price;
+
+            priceTemp[item.symbol] = res.data.price;
+            rateTemp[item.symbol] = res.data.rate ?? null;
           }
-        } catch {
-          priceMap[item.symbol] = oldPrices[item.symbol] || 0;
+        } catch (err) {
+          priceTemp[item.symbol] = oldPrices[item.symbol] || 0;
+          rateTemp[item.symbol] = null;
         }
       })
     );
 
     setPrevPrices(oldPrices);
-    setPrices(priceMap);
+    setPrices(priceTemp);
+    setRateMap(rateTemp);
   };
 
   /* ===============================
-     초기 로딩 + 3초 폴링
+     ⏱ 초기 + 실시간 폴링
+     (CRYPTO / KOREA만 3초)
   =============================== */
   useEffect(() => {
     let timer;
@@ -76,7 +108,7 @@ export default function Watchlist() {
   }, []);
 
   /* ===============================
-     삭제
+     ❌ 삭제
   =============================== */
   const removeItem = async (id) => {
     await axios.delete(
@@ -94,25 +126,38 @@ export default function Watchlist() {
 
       {list.map((item) => {
         const current = prices[item.symbol] || 0;
-        const prev = prevPrices[item.symbol];
+        const apiRate = rateMap[item.symbol];
 
-        const changeClass =
-          prev === undefined
-            ? ""
-            : current > prev
-            ? "price-rise"
-            : current < prev
-            ? "price-fall"
-            : "";
+        let diff = 0;
+        let rate = 0;
+
+        if (apiRate !== null && apiRate !== undefined) {
+          rate = apiRate;
+          diff = Math.round(current * (rate / 100));
+        } else {
+          const prev = prevPrices[item.symbol];
+          if (prev) {
+            diff = current - prev;
+            rate = ((diff / prev) * 100).toFixed(2);
+          }
+        }
+
+        const isUp = diff > 0;
+        const isDown = diff < 0;
+        const changeClass = isUp ? "price-rise" : isDown ? "price-fall" : "";
 
         return (
           <div
             key={item._id}
             className="watch-card"
             onClick={() => {
-              item.market === "CRYPTO"
-                ? navigate(`/crypto/${item.symbol}`)
-                : navigate(`/stock/korea/${item.symbol}`);
+              if (item.market === "CRYPTO") {
+                navigate(`/crypto/${item.symbol}`);
+              } else if (item.market === "US") {
+                navigate(`/stock/us/${item.symbol}`);
+              } else {
+                navigate(`/stock/korea/${item.symbol}`);
+              }
             }}
           >
             {/* 왼쪽 */}
@@ -127,6 +172,13 @@ export default function Watchlist() {
             <div className="right">
               <div className={`price ${changeClass}`}>
                 {current.toLocaleString()}원
+              </div>
+
+              <div className={`change ${changeClass}`}>
+                {isUp && "▲ "}
+                {isDown && "▼ "}
+                {diff >= 0 ? "+" : ""}
+                {diff.toLocaleString()}원 ({Number(rate).toFixed(2)}%)
               </div>
 
               <button

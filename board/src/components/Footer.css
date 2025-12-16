@@ -1,0 +1,89 @@
+.site-footer {
+  width: 100%;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  padding: 30px 0;
+  margin-top: 80px;
+}
+
+.footer-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+/* 링크 (윗줄) */
+.footer-links {
+  font-size: 13px;
+  color: #374151;
+}
+
+.footer-links a {
+  color: #374151;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}
+
+.footer-links .dot {
+  margin: 0 6px;
+  color: #9ca3af;
+}
+
+/* 🔽 회사 정보 (아래 줄) */
+.footer-info {
+  display: block;        /* 핵심 */
+  margin-top: 8px;       /* 줄 내려주는 포인트 */
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.footer-info p {
+  margin: 0;
+}
+
+/* 우측 버튼 */
+.footer-right {
+  margin-left: auto;
+}
+
+.related-btn {
+  padding: 8px 14px;
+  border: 1px solid #d1d5db;
+  background: white;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #374151;
+}
+
+.related-btn span {
+  margin-left: 6px;
+  font-weight: 700;
+}
+
+.footer-info p {
+  margin-top: 5px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .footer-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .footer-right {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}

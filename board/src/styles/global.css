@@ -404,7 +404,7 @@ input {
 
 .portfolio-card .left p {
   color: #9aa4b2;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .portfolio-card .right {
@@ -419,6 +419,8 @@ input {
   border: none;
   cursor: pointer;
   font-weight: 600;
+  width: 60px;
+  height: 40px;
 }
 
 .edit-btn {
@@ -441,6 +443,7 @@ input {
   border-radius: 6px;
   border: none;
   width: 90px;
+  height: 40px;
 }
 
 .save-btn {
@@ -448,10 +451,51 @@ input {
   color: white;
 }
 
-.cancel-btn {
-  background: #6b7280;
+
+.edit-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.edit-field label {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.edit-field input {
+  width: 90px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #374151;
+  background: #0b0e11;
   color: white;
 }
+
+.save-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #22c55e;
+  border: none;
+  color: white;
+  font-weight: 600;
+}
+
+.cancel-btn {
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: #e74c3c;
+  border: none;
+  color: white;
+}
+
+
 
 /* ===============================
    Portfolio Summary (가로 요약 카드)
@@ -496,15 +540,36 @@ input {
   font-weight: 800;
 }
 
-/* 🔴 수익 플러스 (국내 증권앱 스타일) */
+/* 수익 플러스 (국내 증권앱 스타일) */
 .summary-profit.plus strong {
   color: #dc2626;
 }
 
-/* 🔵 손실 마이너스 */
+/* 손실 마이너스 */
 .summary-profit.minus strong {
   color: #2563eb;
 }
+/*app footer 바닥 고정*/
+html, body {
+  height: 100%;
+}
+
+#root {
+  min-height: 100%;
+}
+
+/* 🔽 Sticky Footer 핵심 */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1; /* 내용이 적어도 footer를 아래로 밀어줌 */
+}
+
+
 
 /* 반응형 */
 @media (max-width: 768px) {

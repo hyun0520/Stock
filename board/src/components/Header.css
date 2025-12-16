@@ -154,7 +154,7 @@
   inset: 0;
   background: rgba(0,0,0,0.65);
   backdrop-filter: blur(2px);
-  z-index: 900;
+  z-index: 700;
 }
 
 /* modal wrapper (centered, floating) */
@@ -304,16 +304,17 @@
   border: 1px solid rgba(255,138,0,0.45);
 }
 
-/* ❌ 최근 검색 삭제 버튼 */
+/* 최근 검색 삭제 버튼 */
 .recent-remove-btn {
-  background: transparent;
+  background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.4);
-  font-size: 16px;
+  color: #9aa4b2;        /* 기본 회색 */
   cursor: pointer;
-  padding: 4px;
+  font-size: 16px;
+  transition: color 0.2s ease;
 }
 
 .recent-remove-btn:hover {
-  color: #ef4444;
+  color: #ef4444;        /* 🔥 hover 시만 빨간색 */
 }
+

@@ -11,15 +11,18 @@ import {
   ResponsiveContainer
 } from "recharts";
 
+// 달러 → 원 환율
+const USD_TO_KRW = 1474;
+
 export default function Portfolio() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [editId, setEditId] = useState(null);
   const [qty, setQty] = useState("");
-  const [price, setPrice] = useState("");
+  const [price, setPrice] = useState(""); // 🔹 US는 달러 입력
 
-  // 🔥 현재가 저장 (id → price)
+  // 현재가 저장 (id → price, 원화 기준)
   const [priceMap, setPriceMap] = useState({});
 
   const token = localStorage.getItem("token");
@@ -41,42 +44,48 @@ export default function Portfolio() {
 
   /* ===============================
      🔥 현재가 불러오기 (주식 + 코인, 3초 폴링)
+     - US: USD → KRW
   =============================== */
   useEffect(() => {
-  if (!list.length) return;
+    if (!list.length) return;
 
-  let timer;
+    let timer;
 
-  const fetchPrices = async () => {
-    const prices = {};
+    const fetchPrices = async () => {
+      const prices = {};
 
-    for (const item of list) {
-      try {
-        if (item.market === "CRYPTO") {
-          // ✅ 업비트 현재가
-          const data = await fetchCryptoPrice(item.symbol);
-          prices[item._id] = data.price;
-        } else {
-          // ✅ 국내주식
-          const res = await axios.get(
-            `http://localhost:5000/api/stock/korea/${item.symbol}`
-          );
-          prices[item._id] = res.data.price;
+      for (const item of list) {
+        try {
+          if (item.market === "CRYPTO") {
+            const data = await fetchCryptoPrice(item.symbol);
+            prices[item._id] = data.price;
+
+          } else if (item.market === "US") {
+            const res = await axios.get(
+              `http://localhost:5000/api/usStock/${item.symbol}`
+            );
+            const usd = res.data.price || 0;
+            prices[item._id] = Math.round(usd * USD_TO_KRW);
+
+          } else {
+            const res = await axios.get(
+              `http://localhost:5000/api/stock/korea/${item.symbol}`
+            );
+            prices[item._id] = res.data.price;
+          }
+        } catch {
+          prices[item._id] = priceMap[item._id] || 0;
         }
-      } catch (e) {
-        prices[item._id] = priceMap[item._id] || 0;
       }
-    }
 
-    setPriceMap(prices);
-  };
+      setPriceMap(prices);
+    };
 
-    fetchPrices();                 // 최초 1회
-    timer = setInterval(fetchPrices, 3000); // ⏱ 3초 폴링
+    fetchPrices();
+    timer = setInterval(fetchPrices, 3000);
 
     return () => clearInterval(timer);
   }, [list]);
-
 
   /* ===============================
      삭제
@@ -92,24 +101,47 @@ export default function Portfolio() {
   };
 
   /* ===============================
-     수정
+     수정 시작
+     - US: 원화 → 달러로 변환해서 input에 표시
   =============================== */
   const startEdit = (item) => {
     setEditId(item._id);
     setQty(item.quantity);
-    setPrice(item.buyPrice);
+
+    if (item.market === "US") {
+      setPrice((item.buyPrice / USD_TO_KRW).toFixed(2)); // $ 표시
+    } else {
+      setPrice(item.buyPrice);
+    }
   };
 
+  /* ===============================
+     수정 저장
+     - US: 달러 → 원화로 변환 후 저장
+  =============================== */
   const saveEdit = async (id) => {
+    const item = list.find((i) => i._id === id);
+    if (!item) return;
+
+    let buyPriceKRW = Number(price);
+
+    if (item.market === "US") {
+      buyPriceKRW = Math.round(Number(price) * USD_TO_KRW);
+    }
+
     const res = await axios.put(
       `http://localhost:5000/api/portfolio/${id}`,
-      { quantity: Number(qty), buyPrice: Number(price) },
+      {
+        quantity: Number(qty),
+        buyPrice: buyPriceKRW
+      },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
     setList((prev) =>
       prev.map((i) => (i._id === id ? res.data : i))
     );
+
     setEditId(null);
     setQty("");
     setPrice("");
@@ -150,129 +182,102 @@ export default function Portfolio() {
     <div className="portfolio-wrap">
       <h1>📊 내 포트폴리오</h1>
 
-      {/* ===============================
-          요약 카드
-      =============================== */}
+      {/* 요약 */}
       <div className="portfolio-summary horizontal">
         <div className="summary-item">
           <span className="label">총 평가금액</span>
-          <span className="value">
-            {totalEval.toLocaleString()}원
-          </span>
+          <span className="value">{totalEval.toLocaleString()}원</span>
         </div>
-
         <div className="summary-item">
           <span className="label">총 매수금액</span>
-          <span className="value muted">
-            {totalBuy.toLocaleString()}원
-          </span>
+          <span className="value muted">{totalBuy.toLocaleString()}원</span>
         </div>
-
         <div className="summary-item">
-          <span
-            className={`value ${
-              isTotalPlus ? "profit-plus" : "profit-minus"
-            }`}
-          >
-            {isTotalPlus ? "▲" : "▼"}{" "}
-            {totalProfit.toLocaleString()}원 ({totalRate}%)
+          <span className={`value ${isTotalPlus ? "profit-plus" : "profit-minus"}`}>
+            {isTotalPlus ? "▲" : "▼"} {totalProfit.toLocaleString()}원 ({totalRate}%)
           </span>
         </div>
       </div>
 
-      {/* ===============================
-          비중 차트
-      =============================== */}
+      {/* 차트 */}
       <div className="portfolio-chart">
         <h3>📌 포트폴리오 비중</h3>
-
-        {pieData.length === 0 ? (
-          <p>차트 데이터가 없습니다.</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie
-                data={pieData}
-                dataKey="value"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={90}
-                label
-              >
-                {pieData.map((_, index) => (
-                  <Cell
-                    key={index}
-                    fill={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        )}
+        <ResponsiveContainer width="100%" height={280}>
+          <PieChart>
+            <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
+              {pieData.map((_, i) => (
+                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
 
-      {/* ===============================
-          포트폴리오 목록
-      =============================== */}
+      {/* 목록 */}
       {list.map((item) => {
         const current = priceMap[item._id] || 0;
-
         const buyTotal = item.buyPrice * item.quantity;
         const evalTotal = current * item.quantity;
         const profit = evalTotal - buyTotal;
-        const rate =
-          buyTotal > 0 ? ((profit / buyTotal) * 100).toFixed(2) : 0;
-
+        const rate = buyTotal > 0 ? ((profit / buyTotal) * 100).toFixed(2) : 0;
         const isPlus = profit >= 0;
 
         return (
           <div className="portfolio-card" key={item._id}>
             <div className="left">
-              <strong>
-                {item.name} ({item.symbol})
-              </strong>
+              <strong>{item.name} ({item.symbol})</strong>
               <p>{item.market}</p>
             </div>
 
             {editId === item._id ? (
               <div className="edit-box">
-                <input
-                  type="number"
-                  value={qty}
-                  onChange={(e) => setQty(e.target.value)}
-                />
-                <input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                />
-                <button onClick={() => saveEdit(item._id)}>저장</button>
-                <button onClick={() => setEditId(null)}>취소</button>
-              </div>
+                <div className="edit-field">
+                  <label>수량</label>
+                  <input
+                    type="number"
+                    value={qty}
+                    onChange={(e) => setQty(e.target.value)}
+                  />
+                </div>
+
+                <div className="edit-field">
+                  <label>금액</label>
+                  <input
+                    type="number"
+                    value={price}
+                    placeholder={item.market === "US" ? "$" : "원"}
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
+                </div>
+
+                <button className="save-btn" onClick={() => saveEdit(item._id)}>
+                  저장
+                </button>
+                <button className="cancel-btn" onClick={() => setEditId(null)}>
+                  취소
+                </button>
+              </div>  
             ) : (
               <div className="right">
                 <span>보유: {item.quantity}</span>
                 <span>매수가: {item.buyPrice.toLocaleString()}원</span>
                 <span>
                   현재가:{" "}
-                  <strong
-                    style={{
-                      color: isPlus ? "#16a34a" : "#dc2626"
-                    }}
-                  >
+                  <strong style={{ color: isPlus ? "#16a34a" : "#dc2626" }}>
                     {current.toLocaleString()}원
                   </strong>
                 </span>
                 <span>평가금액: {evalTotal.toLocaleString()}원</span>
-
                 <span className={isPlus ? "profit plus" : "profit minus"}>
                   {isPlus ? "▲" : "▼"} {profit.toLocaleString()}원 ({rate}%)
                 </span>
-
-                <button onClick={() => startEdit(item)}>수정</button>
-                <button onClick={() => handleDelete(item._id)}>삭제</button>
+                <button className="edit-btn" onClick={() => startEdit(item)}>
+                  수정
+                </button>
+                <button className="delete-btn" onClick={() => handleDelete(item._id)}>
+                  삭제
+                </button>
               </div>
             )}
           </div>
