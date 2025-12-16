@@ -7,6 +7,7 @@ import watchlistRoutes from "./routes/watchlist.js";
 import portfolioRoutes from "./routes/portfolio.js";
 import cryptoRoutes from "./routes/crypto.js";
 import searchRoutes from "./routes/search.js";
+import usStockRoutes from "./routes/usStock.js";
 
 // Routes
 import userRoutes from "./routes/user.js";
@@ -31,6 +32,7 @@ app.use("/api/watchlist", watchlistRoutes);
 app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/crypto", cryptoRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/usStock", usStockRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server Running");

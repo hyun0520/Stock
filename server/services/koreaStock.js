@@ -2,25 +2,39 @@ import axios from "axios";
 import { loadKoreaStocks } from "../utils/loadKoreaStocks.js";
 
 /* ===============================
-   🔍 종목 검색 (CSV 기반)
+   🔍 국내주식 종목 검색 (CSV 기반)
+   - 부분 검색 강화
+   - 공백 / 대소문자 정규화
+   - 종목코드 / 회사명 모두 지원
 =============================== */
 export async function searchKoreaStock(q = "") {
   if (!q) return [];
 
   const list = loadKoreaStocks();
 
-  const keyword = q.trim().toLowerCase();
+  // 검색어 정규화
+  const keywordRaw = q.trim();
+  const keyword = keywordRaw.replace(/\s/g, "").toLowerCase();
   const isNumber = /^\d+$/.test(keyword);
-  const normalized = isNumber
+
+  // 숫자면 종목코드 (6자리 패딩)
+  const normalizedCode = isNumber
     ? keyword.padStart(6, "0")
-    : keyword;
+    : null;
 
   return list
-    .filter(
-      (item) =>
-        item.symbol.includes(normalized) ||
-        item.name.toLowerCase().includes(keyword)
-    )
+    .filter((item) => {
+      const name = item.name.replace(/\s/g, "").toLowerCase();
+      const symbol = item.symbol.toLowerCase();
+
+      // 종목코드 검색
+      if (normalizedCode && symbol.includes(normalizedCode)) {
+        return true;
+      }
+
+      // 회사명 부분 검색
+      return name.includes(keyword);
+    })
     .slice(0, 20);
 }
 
@@ -49,7 +63,9 @@ export async function getKoreaStockDetail(symbol) {
     name: item.stockName,
     market: "KOREA",
     price: Number(String(item.closePrice).replace(/,/g, "")),
-    change: Number(String(item.compareToPreviousClosePrice).replace(/,/g, "")),
+    change: Number(
+      String(item.compareToPreviousClosePrice).replace(/,/g, "")
+    ),
     rate: Number(item.fluctuationsRatio)
   };
 }
@@ -76,7 +92,10 @@ export async function getKoreaStockChart(symbol, period = "1M") {
     }
   });
 
-  const raw = String(res.data).replace(/'/g, '"').replace(/\n/g, "");
+  const raw = String(res.data)
+    .replace(/'/g, '"')
+    .replace(/\n/g, "");
+
   const parsed = JSON.parse(raw);
   parsed.shift(); // header 제거
 
