@@ -498,84 +498,228 @@ input {
 
 
 /* ===============================
-   Portfolio Summary (가로 요약 카드)
+   Portfolio Summary (FIXED)
 ================================ */
 
-/* ===== Portfolio Summary ===== */
-.portfolio-summary {
-  display: flex;
+.portfolio-summary.dashboard-style {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
   gap: 32px;
-  margin: 20px 0 30px;
-  padding: 20px 24px;
+
+  padding: 28px 36px;
+  margin: 24px 0 36px;
+
   background: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-  align-items: center;
+  border-radius: 18px;
+
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(0, 0, 0, 0.04);
 }
 
 .summary-item {
   display: flex;
   flex-direction: column;
+  gap: 6px;
 }
 
+/* 라벨 */
 .summary-item .label {
-  font-size: 13px;
+  font-size: 14px;
   color: #6b7280;
-  margin-bottom: 4px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
-.summary-item strong {
-  font-size: 20px;
-  font-weight: 700;
-}
 
-/* 손익 강조 */
-.summary-profit {
-  display: flex;
-  flex-direction: column;
-}
 
-.summary-profit strong {
-  font-size: 22px;
+
+
+.profit-amount {
+  font-size: 24px;
   font-weight: 800;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
-/* 수익 플러스 (국내 증권앱 스타일) */
-.summary-profit.plus strong {
+/* 수익 → 파랑 */
+.profit-plus {
+  color: #16a34a;
+}
+
+/* 손실 → 빨강 */
+.profit-minus {
+  color: #dc2626;
+}
+/* ===== 총 평가금액 (손익 연동) ===== */
+.main-amount {
+  font-size: 27px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* ===== 총 매수금액 (고정 스타일) ===== */
+.buy-amount-fixed {
+  font-size: 24px;        
+  font-weight: 800;       
+  letter-spacing: -0.02em;
+  color: #111827;         
+}
+
+/* ===== 총 손익 ===== */
+.profit-amount {
+  font-size: 25px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* 수익 → 파랑 (대시보드 스타일) */
+.profit-plus {
+  color: #16a34a;
+}
+
+/* 손실 → 빨강 */
+.profit-minus {
   color: #dc2626;
 }
 
-/* 손실 마이너스 */
-.summary-profit.minus strong {
-  color: #2563eb;
-}
-/*app footer 바닥 고정*/
-html, body {
-  height: 100%;
+/* 총 평가금액 / 손익 금액 공통 */
+.main-amount,
+.profit-amount {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+
+/* 핵심 */
+  font-size: clamp(18px, 3.5vw, 24px);
+  white-space: nowrap;      /* 줄바꿈 방지 */
+  overflow: hidden;
+  text-overflow: ellipsis;  /* 정말 길면 … 처리 */
 }
 
-#root {
-  min-height: 100%;
+/* ===== Donut Chart Legend ===== */
+.donut-legend {
+  margin-top: 16px;
+  padding-left: 12px;
 }
 
-/* 🔽 Sticky Footer 핵심 */
-.app-shell {
-  min-height: 100vh;
+.legend-row {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
 }
 
-.app-main {
-  flex: 1; /* 내용이 적어도 footer를 아래로 밀어줌 */
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
+.legend-name {
+  flex: 1;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
+.legend-percent {
+  color: #6b7280;
+  font-weight: 600;
+}
 
 /* 반응형 */
 @media (max-width: 768px) {
-  .portfolio-summary.horizontal {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+  .portfolio-summary.dashboard-style {
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
+
+  .profit-box {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+/* ===== Portfolio Chart Layout ===== */
+
+.portfolio-chart-wrap {
+  margin-top: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+  
+
+.portfolio-chart-row {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+/* 차트 */
+.chart-box {
+  flex-shrink: 0;
+}
+
+.portfolio-chart-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 32px; /* ← 이게 핵심 */
+}
+
+/* 오른쪽 비율 리스트 */
+.chart-legend {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 1fr));
+  column-gap: 32px;
+  row-gap: 14px;
+  min-width: 320px;
+}
+
+.legend-row {
+  display: grid;
+  grid-template-columns: 14px 1fr auto;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.chart-legend {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 40px;
+  row-gap: 14px;
+  justify-items: stretch;
+  max-width: 420px;
+}
+.portfolio-chart-wrap {
+  margin-top: 40px;
+}
+
+.portfolio-chart-wrap h3 {
+  margin-bottom: 300px;
+  font-size: 24px;
+}
+.chart-area {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  align-items: center;
+  justify-content: center;
+  gap: 48px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.legend-name {
+  flex: 1;
+  color: #111827;
+}
+
+.legend-percent {
+  color: #6b7280;
+  font-weight: 600;
 }

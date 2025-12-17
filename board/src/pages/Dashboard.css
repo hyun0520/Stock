@@ -228,11 +228,11 @@
 }
 
 .index-info.plus {
-  color: #dc2626; /* 상승 */
+  color: #16a34a; /* 상승 */
 }
 
 .index-info.minus {
-  color: #2563eb; /* 하락 */
+  color: #dc2626; /* 하락 */
 }
 
 
@@ -291,8 +291,8 @@
   margin-right: 8px;
 }
 
-.diff.up { color: #e11d48; }
-.diff.down { color: #2563eb; }
+.diff.up { color: #16a34a; }
+.diff.down { color: #dc2626; }
 
 .badge {
   font-size: 11px;
@@ -330,11 +330,11 @@
 }
 
 .up {
-  color: #e11d48; /* 빨강 */
+  color: #16a34a;
 }
 
 .down {
-  color: #2563eb; /* 파랑 */
+  color: #dc2626;
 }
 
 .chart-tooltip {

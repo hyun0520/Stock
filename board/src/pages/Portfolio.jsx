@@ -26,6 +26,17 @@ export default function Portfolio() {
   const [priceMap, setPriceMap] = useState({});
 
   const token = localStorage.getItem("token");
+   /* ===============================
+     종목 수만큼 자동으로 다른 색 생성
+  =============================== */
+  const generateColors = (count) => {
+    const colors = [];
+    for (let i = 0; i < count; i++) {
+      const hue = Math.floor((360 / count) * i);
+      colors.push(`hsl(${hue}, 70%, 55%)`);
+    }
+    return colors;
+  };
 
   /* ===============================
      포트폴리오 불러오기
@@ -174,44 +185,101 @@ export default function Portfolio() {
     value: (priceMap[item._id] || 0) * item.quantity
   }));
 
-  const COLORS = ["#22c55e", "#2563eb", "#f59e0b", "#ef4444", "#8b5cf6"];
+  const COLORS = generateColors(pieData.length);
 
   if (loading) return <div className="portfolio-wrap">로딩 중...</div>;
 
   return (
     <div className="portfolio-wrap">
-      <h1>📊 내 포트폴리오</h1>
+      <h1>MY PORTFOLIO</h1>
 
-      {/* 요약 */}
-      <div className="portfolio-summary horizontal">
-        <div className="summary-item">
-          <span className="label">총 평가금액</span>
-          <span className="value">{totalEval.toLocaleString()}원</span>
-        </div>
-        <div className="summary-item">
-          <span className="label">총 매수금액</span>
-          <span className="value muted">{totalBuy.toLocaleString()}원</span>
-        </div>
-        <div className="summary-item">
-          <span className={`value ${isTotalPlus ? "profit-plus" : "profit-minus"}`}>
-            {isTotalPlus ? "▲" : "▼"} {totalProfit.toLocaleString()}원 ({totalRate}%)
-          </span>
-        </div>
+      {/* 자산 */}
+      <div className="portfolio-summary dashboard-style">
+      {/* 총 평가금액 */}
+      <div className="summary-item">
+        <span className="label">총 평가금액</span>
+        <span
+          className={`main-amount ${
+            isTotalPlus ? "profit-plus" : "profit-minus"
+          }`}
+        >
+          {Math.round(totalEval).toLocaleString()}원
+        </span>
       </div>
 
+      {/* 총 매수금액 */}
+      <div className="summary-item">
+        <span className="label">총 매수금액</span>
+        <span className="buy-amount-fixed">
+          {totalBuy.toLocaleString()}원
+        </span>
+      </div>
+
+      {/* 총 손익 */}
+      <div className="summary-item profit-box">
+        <span className="label">총 손익</span>
+        <span
+          className={`profit-amount ${
+            isTotalPlus ? "profit-plus" : "profit-minus"
+          }`}
+        >
+          {isTotalPlus ? "▲ " : "▼ "}
+          {Math.round(totalProfit).toLocaleString()}원 ({totalRate}%)
+        </span>
+      </div>
+    </div>
+
+
       {/* 차트 */}
-      <div className="portfolio-chart">
-        <h3>📌 포트폴리오 비중</h3>
-        <ResponsiveContainer width="100%" height={280}>
-          <PieChart>
-            <Pie data={pieData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
-              {pieData.map((_, i) => (
-                <Cell key={i} fill={COLORS[i % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
+      <div className="portfolio-chart-wrap">
+        <h3>보유자산</h3>
+
+        <div className="portfolio-chart-row">
+          {/* 왼쪽: 도넛 차트 */}
+          <div className="chart-box">
+            <ResponsiveContainer width={260} height={260}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  dataKey="value"
+                  innerRadius={65}
+                  outerRadius={100}
+                  cx="50%"
+                  cy="50%"
+                  isAnimationActive={false}
+                >
+                  {pieData.map((_, i) => (
+                    <Cell
+                      key={i}
+                      fill={COLORS[i % COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* 오른쪽: 비율 리스트 */}
+          <div className="chart-legend">
+            {pieData.map((item, i) => {
+              const percent =
+                totalEval > 0
+                  ? ((item.value / totalEval) * 100).toFixed(1)
+                  : 0;
+
+              return (
+                <div className="legend-row" key={i}>
+                  <span
+                    className="legend-dot"
+                    style={{ backgroundColor: COLORS[i % COLORS.length] }}
+                  />
+                  <span className="legend-name">{item.name}</span>
+                  <span className="legend-percent">{percent}%</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* 목록 */}

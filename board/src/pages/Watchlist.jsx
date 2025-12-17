@@ -16,7 +16,7 @@ export default function Watchlist() {
   const navigate = useNavigate();
 
   /* ===============================
-     ⭐ 관심종목 불러오기
+     관심종목 불러오기
   =============================== */
   const fetchWatchlist = async () => {
     const res = await axios.get(
@@ -28,7 +28,7 @@ export default function Watchlist() {
   };
 
   /* ===============================
-     💰 현재가 + 등락률
+     현재가 + 등락률
   =============================== */
   const fetchPrices = async (items) => {
     const priceTemp = {};
@@ -87,7 +87,7 @@ export default function Watchlist() {
   };
 
   /* ===============================
-     ⏱ 초기 + 실시간 폴링
+     초기 + 실시간 폴링
      (CRYPTO / KOREA만 3초)
   =============================== */
   useEffect(() => {
@@ -108,7 +108,7 @@ export default function Watchlist() {
   }, []);
 
   /* ===============================
-     ❌ 삭제
+     삭제
   =============================== */
   const removeItem = async (id) => {
     await axios.delete(
@@ -122,7 +122,7 @@ export default function Watchlist() {
 
   return (
     <div style={{ padding: 40, maxWidth: 1000, margin: "0 auto" }}>
-      <h1 style={{ marginBottom: 20 }}>⭐ 내 관심종목</h1>
+      <h1 style={{ marginBottom: 20 }}>MY LIST</h1>
 
       {list.map((item) => {
         const current = prices[item.symbol] || 0;
