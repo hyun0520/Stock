@@ -1,0 +1,473 @@
+.dashboard-wrap {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 24px;
+}
+
+/* ================= MARKET ================= */
+.market-section {
+  margin-bottom: 60px;
+}
+
+.market-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+
+  margin-bottom: 30px;
+  color: #111827;
+}
+.market-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.market-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+}
+
+/* ================= ASSET ================= */
+.asset-section {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 24px;
+  margin-bottom: 60px;
+}
+
+.asset-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.asset-card {
+  background: linear-gradient(135deg, #0b0e11, #111827);
+  color: white;
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.asset-card .label {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.asset-card .value {
+  font-size: 28px;
+  display: block;
+  margin: 8px 0;
+}
+
+.portfolio-mini {
+  background: white;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+
+.portfolio-mini .row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+}
+
+/* ================= TOP ================= */
+.asset-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.top-card {
+  background: linear-gradient(135deg, #0b0e11, #111827);
+  color: white;
+  border-radius: 16px;
+  padding: 16px;
+}
+/*상위하위 타이틀*/
+.top-card h4 {
+  margin-bottom: 13px;
+}
+
+.top-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+
+/* ================= FX ================= */
+.fx-section {
+  margin-bottom: 80px;
+}
+
+/* 타이틀 */
+.fx-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+
+  margin-bottom: 30px;
+  color: #111827;
+}
+
+/* ===== GRID : 한 줄 4개 ===== */
+.fx-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* ===== CARD ===== */
+.fx-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  border: 1px solid #f1f5f9;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+/* 통화명 */
+.fx-card span:first-child {
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  letter-spacing: -0.01em;
+}
+
+/* 환율 + 등락률 라인 */
+.fx-main {
+  display: flex;
+  align-items: baseline;
+  gap: 15px;
+}
+
+/* 환율 숫자 */
+.fx-card strong {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #111827;
+}
+
+/* 등락률 (숫자 옆) */
+.fx-main .plus,
+.fx-main .minus {
+  font-size: 19px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.fx-main .plus {
+  color: #16a34a;
+}
+
+.fx-main .minus {
+  color: #dc2626;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .fx-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .fx-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ================= COLORS ================= */
+.plus {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+.minus {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+
+.index-info {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+  font-size: 14px;
+}
+
+.index-info .label {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.index-info strong {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.index-info.plus {
+  color: #dc2626; /* 상승 */
+}
+
+.index-info.minus {
+  color: #2563eb; /* 하락 */
+}
+
+
+
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 1024px) {
+  .market-grid,
+  .asset-section,
+  .fx-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===============================
+   Market Badge
+================================ */
+
+.market-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.market-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
+}
+
+.market-badge.live {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.market-badge.close {
+  background: #9ca3af;
+  color: #ffffff;
+}
+
+.market-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.market-price {
+  margin: 6px 0 4px;
+  font-size: 14px;
+}
+
+.price {
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+.diff.up { color: #e11d48; }
+.diff.down { color: #2563eb; }
+
+.badge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.badge.live {
+  background: #16a34a;
+  color: white;
+}
+
+.badge.close {
+  background: #9ca3af;
+  color: white;
+}
+
+.market-price-strong {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 6px 0 8px;
+}
+
+.main-price {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.price-diff {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.up {
+  color: #e11d48; /* 빨강 */
+}
+
+.down {
+  color: #2563eb; /* 파랑 */
+}
+
+.chart-tooltip {
+  background: white;
+  padding: 8px 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  font-size: 13px;
+}
+
+.chart-tooltip .time {
+  color: #6b7280;
+  font-size: 12px;
+  margin-bottom: 2px;
+}
+
+.chart-tooltip .price {
+  font-weight: 700;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+
+.portfolio-mini-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 0.8fr;
+  align-items: center;
+
+  padding: 8px 0px;
+  border-radius: 10px;
+}
+
+.portfolio-mini-row .name {
+  font-weight: 500;
+}
+
+.portfolio-mini-row .eval {
+  text-align: right;
+  color: #111;
+  font-weight: 500;
+}
+/* 포트폴리오 타이틀 */
+.portfolio-mini h3 {
+  margin-bottom: 14px;
+}
+
+.portfolio-mini-row .rate {
+  text-align: right;
+  font-weight: 600;
+}
+
+.portfolio-mini-row .rate.plus {
+  color: #16a34a; /* 초록 */
+}
+
+.portfolio-mini-row .rate.minus {
+  color: #dc2626; /* 빨강 */
+}
+
+
+
+/* ===============================
+   Portfolio "더보기" 자연스러운 스타일
+=============================== */
+.portfolio-more {
+  margin-top: 13.2px;
+  padding-top: 6px;
+
+  font-size: 15px;
+  color: #9ca3af; /* 연한 그레이 */
+  cursor: pointer;
+
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+.portfolio-more:hover {
+  color: #111827; /* 거의 블랙 */
+  text-decoration: underline;
+}
+
+/* ===== Portfolio mini row ===== */
+.portfolio-mini-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 0.8fr;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.portfolio-mini-row:hover {
+  background: rgba(15, 23, 42, 0.06);
+  transform: translateY(-1px);
+}
+
+.portfolio-mini-row .name {
+  font-weight: 600;
+}
+
+.portfolio-mini-row .eval {
+  text-align: right;
+  font-weight: 500;
+}
+
+.portfolio-mini-row .rate {
+  text-align: right;
+  font-weight: 700;
+}
+
+.portfolio-mini-row .rate.plus {
+  color: #16a34a;
+}
+
+.portfolio-mini-row .rate.minus {
+  color: #dc2626;
+}
+
+.top-item.clickable {
+  cursor: pointer;
+}
+
+
+.top-item.clickable:hover {
+  background: rgba(255, 255, 255, 0.08);
+  transform: translateX(4px);
+}
+
+/* 선택: 클릭 시 살짝 눌리는 느낌 */
+.top-item.clickable:active {
+  transform: translateX(2px) scale(0.98);
+}
+

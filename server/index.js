@@ -8,6 +8,8 @@ import portfolioRoutes from "./routes/portfolio.js";
 import cryptoRoutes from "./routes/crypto.js";
 import searchRoutes from "./routes/search.js";
 import usStockRoutes from "./routes/usStock.js";
+import marketRouter from "./routes/market.js";
+import fxRoutes from "./routes/fx.js";
 
 // Routes
 import userRoutes from "./routes/user.js";
@@ -33,6 +35,8 @@ app.use("/api/portfolio", portfolioRoutes);
 app.use("/api/crypto", cryptoRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/usStock", usStockRoutes);
+app.use("/api/market", marketRouter);
+app.use("/api/fx", fxRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server Running");
