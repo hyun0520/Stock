@@ -1,10 +1,16 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-dotenv.config({ path: "../.env" });
 import mongoose from "mongoose";
 
-// Routes
+// ===============================
+// 🔥 ENV
+// ===============================
+dotenv.config(); // ✅ Render에서는 이것만 사용
+
+// ===============================
+// 🔥 Routes
+// ===============================
 import stockRoutes from "./routes/stock.js";
 import watchlistRoutes from "./routes/watchlist.js";
 import portfolioRoutes from "./routes/portfolio.js";
@@ -15,31 +21,35 @@ import marketRouter from "./routes/market.js";
 import fxRoutes from "./routes/fx.js";
 import userRoutes from "./routes/user.js";
 
-dotenv.config();
-
+// ===============================
+// 🔥 App
+// ===============================
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// ===============================
+// 🔥 MongoDB
+// ===============================
 console.log("ENV CHECK:", process.env.MONGO_URI);
-/* ===============================
-   🔥 MongoDB
-=============================== */
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("🔥 MongoDB Connected"))
   .catch((err) => {
-    console.error("❌ DB Error:", err);
+    console.error("❌ MongoDB Error:", err);
     process.exit(1);
   });
 
-/* ===============================
-   🔥 Middleware
-=============================== */
+// ===============================
+// 🔥 Middleware
+// ===============================
+// ✅ Netlify + Local 둘 다 허용 (문제 생기면 origin 제한 가능)
 app.use(cors());
 app.use(express.json());
 
-/* ===============================
-   🔥 Routes
-=============================== */
+// ===============================
+// 🔥 API Routes
+// ===============================
 app.use("/api/auth", userRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/stock", stockRoutes);
@@ -51,10 +61,16 @@ app.use("/api/usStock", usStockRoutes);
 app.use("/api/market", marketRouter);
 app.use("/api/fx", fxRoutes);
 
+// ===============================
+// 🔥 Health Check
+// ===============================
 app.get("/", (req, res) => {
   res.send("Server Running");
 });
 
+// ===============================
+// 🔥 Start Server
+// ===============================
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
