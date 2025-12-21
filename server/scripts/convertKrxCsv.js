@@ -39,7 +39,7 @@ function convert(type) {
     })
     .on("end", () => {
       fs.writeFileSync(jsonPath, JSON.stringify(rows, null, 2));
-      console.log(`✅ ${type} JSON 생성 완료 (${rows.length})`);
+      console.log(`${type} JSON 생성 완료 (${rows.length})`);
     });
 }
 

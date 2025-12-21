@@ -56,7 +56,7 @@ async function fetchDaily(type) {
   );
 
   fs.writeFileSync(filePath, csv);
-  console.log(`✅ ${type} DAILY CSV 저장 완료`);
+  console.log(`${type} DAILY CSV 저장 완료`);
 }
 
 await fetchDaily("KOSPI");

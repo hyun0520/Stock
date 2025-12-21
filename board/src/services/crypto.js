@@ -17,3 +17,4 @@ export const fetchCryptoPrice = async (market) => {
   const res = await axios.get(`/api/crypto/price/${market}`);
   return res.data;
 };
+

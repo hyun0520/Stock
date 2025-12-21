@@ -1,38 +1,22 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import axios from "axios";
-
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "react-router-dom";
+import AssetActions from "../components/AssetActions";
 
 export default function StockDetailUS() {
   const { symbol } = useParams();
 
   const [detail, setDetail] = useState(null);
-  const [chart, setChart] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
 
-  // 💱 실시간 환율 (기본값 fallback)
+  // 💱 환율 (USD → KRW)
   const [usdRate, setUsdRate] = useState(1350);
 
-  // 포트폴리오 모달
-  const [portfolioOpen, setPortfolioOpen] = useState(false);
-  const [qty, setQty] = useState("");
-  const [buy, setBuy] = useState(""); // 🔹 달러 입력
-  const [msg, setMsg] = useState("");
-
   /* ===============================
-     💱 환율 가져오기 (10분 캐시)
-     - 실패 시 기존 환율 유지
+     환율 가져오기 (10분 캐시)
   =============================== */
   useEffect(() => {
     const fetchRate = async () => {
@@ -42,48 +26,42 @@ export default function StockDetailUS() {
         );
         setUsdRate(res.data.rates.KRW);
       } catch {
-        // 실패해도 기존 값 유지
+        // 실패 시 기존 값 유지
       }
     };
 
-    fetchRate(); // 최초 1회
-    const timer = setInterval(fetchRate, 10 * 60 * 1000); // 10분
-
+    fetchRate();
+    const timer = setInterval(fetchRate, 10 * 60 * 1000);
     return () => clearInterval(timer);
   }, []);
 
   /* ===============================
-     🇺🇸 초기 상세 + 차트
+     🇺🇸 상세 정보 로드 (차트 ❌)
   =============================== */
   useEffect(() => {
     let mounted = true;
 
-    async function fetchInitial() {
+    async function fetchDetail() {
       try {
-        const [detailRes, chartRes] = await Promise.all([
-          axios.get(`/api/usStock/${symbol}`),
-          axios.get(`/api/usStock/${symbol}/chart`)
-        ]);
-
+        const res = await axios.get(`/api/usStock/${symbol}`);
         if (!mounted) return;
-
-        setDetail(detailRes.data || null);
-        setChart(Array.isArray(chartRes.data) ? chartRes.data : []);
+        setDetail(res.data || null);
       } catch (err) {
-        console.error("미국주식 초기 데이터 실패", err);
+        console.error("❌ US stock detail error", err);
+        setError("미국 주식 정보를 불러오지 못했습니다.");
       } finally {
         if (mounted) setLoading(false);
       }
     }
 
-    fetchInitial();
+    fetchDetail();
     return () => {
       mounted = false;
     };
   }, [symbol]);
 
   /* ===============================
-     ⭐ 이미 관심종목인지 서버 기준 체크
+     ⭐ 관심종목 체크
   =============================== */
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -91,10 +69,9 @@ export default function StockDetailUS() {
 
     async function checkWatchlist() {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/watchlist",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await axios.get("/api/watchlist", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
 
         const exists = res.data.some(
           (item) => item.symbol === symbol && item.market === "US"
@@ -102,7 +79,7 @@ export default function StockDetailUS() {
 
         setAdded(exists);
       } catch (err) {
-        console.error("관심종목 체크 실패", err);
+        console.error("❌ watchlist check failed", err);
       }
     }
 
@@ -110,25 +87,46 @@ export default function StockDetailUS() {
   }, [symbol]);
 
   /* ===============================
-     💰 가격 fallback 처리
+    📈 차트 fetch (AssetActions용)
   =============================== */
-  const fallbackPrice =
-    chart.length > 0
-      ? chart[chart.length - 1]?.close ?? 0
-      : 0;
+  const fetchChartByRange = async (range) => {
+    try {
+      const res = await axios.get(
+        `/api/usStock/${symbol}/chart`,
+        { params: { range } }
+      );
 
+      return Array.isArray(res.data) ? res.data : [];
+    } catch (e) {
+      console.error("❌ US chart fetch failed", e);
+      return [];
+    }
+  };
+
+
+  /* ===============================
+     계산값
+  =============================== */
   const price =
     typeof detail?.price === "number" && detail.price > 0
       ? detail.price
-      : fallbackPrice;
+      : 0;
 
   const rate =
     typeof detail?.rate === "number"
       ? detail.rate
       : 0;
 
+  const diff =
+    rate !== 0
+      ? Number((price * (rate / 100)).toFixed(2))
+      : 0;
+
+  const isUp = diff > 0;
+  const isDown = diff < 0;
+
   /* ===============================
-     ⭐ 관심종목 추가
+     관심종목 추가
   =============================== */
   const addToWatchlist = async () => {
     try {
@@ -158,19 +156,14 @@ export default function StockDetailUS() {
   };
 
   /* ===============================
-     📊 포트폴리오 등록
-     👉 달러 입력 → 실시간 환율로 원화 변환
+     포트폴리오 추가
   =============================== */
-  const addToPortfolio = async () => {
+  const addToPortfolio = async (qty, buy) => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      setMsg("로그인이 필요합니다.");
-      return;
-    }
+    if (!token) return "로그인이 필요합니다.";
 
     if (!qty || !buy || Number(qty) <= 0 || Number(buy) <= 0) {
-      setMsg("보유 수량과 매수가를 올바르게 입력하세요.");
-      return;
+      return "보유 수량과 매수가를 올바르게 입력하세요.";
     }
 
     try {
@@ -190,15 +183,9 @@ export default function StockDetailUS() {
         }
       );
 
-      setMsg("✅ 포트폴리오에 등록되었습니다.");
-      setTimeout(() => {
-        setPortfolioOpen(false);
-        setQty("");
-        setBuy("");
-        setMsg("");
-      }, 800);
+      return true;
     } catch (err) {
-      setMsg(
+      return (
         err.response?.data?.msg ||
         "이미 등록되었거나 오류가 발생했습니다."
       );
@@ -206,7 +193,7 @@ export default function StockDetailUS() {
   };
 
   /* ===============================
-     렌더
+     Render
   =============================== */
   if (loading) return <div style={{ padding: 40 }}>로딩 중...</div>;
   if (!detail) return <div style={{ padding: 40 }}>데이터 없음</div>;
@@ -216,184 +203,51 @@ export default function StockDetailUS() {
       <h1>
         {detail.name} ({detail.symbol})
       </h1>
-      <p>🇺🇸 미국주식 · 최근 조회 기준</p>
+      <p style={{ color: "#6b7280" }}>
+        🇺🇸 미국주식 · 최근 조회 기준
+      </p>
 
-      <div style={{ margin: "20px 0", fontSize: 22 }}>
-        💰 현재가: <strong>${price.toLocaleString()}</strong>
+      <div style={{ margin: "14px 0 18px", fontSize: 22 }}>
+        현재가: <strong>${price.toLocaleString()}</strong>
+
         <span
           style={{
             marginLeft: 12,
-            color: rate >= 0 ? "#ef4444" : "#3b82f6"
+            color: isUp ? "#16a34a" : isDown ? "#dc2626" : "#9ca3af"
           }}
         >
+          {isUp && "▲ "}
+          {isDown && "▼ "}
+          {diff >= 0 ? "+" : ""}
+          ${Math.abs(diff).toLocaleString()} (
           {rate >= 0 ? "+" : ""}
-          {rate.toFixed(2)}%
+          {rate.toFixed(2)}%)
         </span>
       </div>
 
-      {/* 📈 차트 */}
-      <div
-        style={{
-          width: "100%",
-          height: 320,
-          background: "#0b0e11",
-          borderRadius: 12,
-          padding: 20
-        }}
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chart}>
-            <XAxis
-              dataKey="time"
-              tick={{ fill: "#9aa4b2" }}
-              tickFormatter={(t) => new Date(t).toLocaleDateString()}
-            />
-            <YAxis tick={{ fill: "#9aa4b2" }} />
-            <Tooltip
-              labelFormatter={(t) => new Date(t).toLocaleDateString()}
-            />
-            <Line
-              type="monotone"
-              dataKey="close"
-              stroke="#ff8a00"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* 버튼 */}
-      <div style={{ marginTop: 30, display: "flex", gap: 12 }}>
-        <button
-          onClick={addToWatchlist}
-          disabled={added || price <= 0}
-          style={{
-            padding: "12px 20px",
-            borderRadius: 10,
-            background:
-              added || price <= 0 ? "#6b7280" : "#ff8a00",
-            border: "none",
-            fontWeight: 600,
-            color: "white",
-            cursor: added ? "not-allowed" : "pointer"
-          }}
-        >
-          {added ? "⭐ 관심종목 추가됨" : "⭐ 관심종목 추가"}
-        </button>
-
-        <button
-          onClick={() => setPortfolioOpen(true)}
-          disabled={price <= 0}
-          style={{
-            padding: "12px 20px",
-            borderRadius: 10,
-            background: price <= 0 ? "#6b7280" : "#1f2937",
-            border: "none",
-            fontWeight: 600,
-            color: "white"
-          }}
-        >
-          📊 포트폴리오 추가
-        </button>
-      </div>
+      {/*  공통 차트 + 액션 */}
+      <AssetActions
+        fetchChart={fetchChartByRange}
+        chartColor="#ff8a00"
+        market="US"
+        price={price}
+        prevPrice={detail.prevPrice}
+        change={diff}
+        rate={rate}
+        open={detail.open}
+        high={detail.high}
+        low={detail.low}
+        volume={detail.volume}
+        high52={detail.high52}
+        low52={detail.low52}
+        added={added}
+        disabled={price <= 0}
+        onAddWatch={addToWatchlist}
+        onAddPortfolio={addToPortfolio}
+        defaultRange="1d"
+      />
 
       {error && <p style={{ marginTop: 10, color: "red" }}>{error}</p>}
-
-      {/* 포트폴리오 모달 */}
-      {portfolioOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.65)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 2000
-          }}
-        >
-          <div
-            style={{
-              width: 360,
-              background: "#0b0e11",
-              borderRadius: 14,
-              padding: 24,
-              color: "white"
-            }}
-          >
-            <h3>📊 포트폴리오 추가</h3>
-
-            <input
-              type="number"
-              placeholder="보유 수량"
-              value={qty}
-              onChange={(e) => setQty(e.target.value)}
-              style={{
-                width: "100%",
-                height: 42,
-                marginTop: 12,
-                borderRadius: 8,
-                border: "none",
-                padding: "0 12px",
-                background: "#1f2937",
-                color: "white"
-              }}
-            />
-
-            <input
-              type="number"
-              placeholder="매수가 ($)"
-              value={buy}
-              onChange={(e) => setBuy(e.target.value)}
-              style={{
-                width: "100%",
-                height: 42,
-                marginTop: 10,
-                borderRadius: 8,
-                border: "none",
-                padding: "0 12px",
-                background: "#1f2937",
-                color: "white"
-              }}
-            />
-
-            {msg && (
-              <p style={{ marginTop: 10, color: "#22c55e" }}>{msg}</p>
-            )}
-
-            <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
-              <button
-                onClick={() => setPortfolioOpen(false)}
-                style={{
-                  flex: 1,
-                  background: "#374151",
-                  color: "white",
-                  border: "none",
-                  padding: 10,
-                  borderRadius: 8
-                }}
-              >
-                취소
-              </button>
-              <button
-                onClick={addToPortfolio}
-                style={{
-                  flex: 1,
-                  background: "#ff8a00",
-                  color: "white",
-                  border: "none",
-                  padding: 10,
-                  borderRadius: 8,
-                  fontWeight: 600
-                }}
-              >
-                추가
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

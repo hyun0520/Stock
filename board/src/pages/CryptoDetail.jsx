@@ -1,331 +1,248 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
+import AssetActions from "../components/AssetActions";
 
 export default function CryptoDetail() {
-  const { market } = useParams(); // KRW-BTC
+  const { market } = useParams(); // 예: KRW-XRP
 
   const [detail, setDetail] = useState(null);
-  const [chart, setChart] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔥 포트폴리오 모달
-  const [portfolioOpen, setPortfolioOpen] = useState(false);
-  const [qty, setQty] = useState("");
-  const [buy, setBuy] = useState("");
-  const [msg, setMsg] = useState("");
-
-  // 🔴🟢 실시간 가격 상태
-  const [prevPrice, setPrevPrice] = useState(null);
-  const [priceUp, setPriceUp] = useState(null); // true | false | null
-
-  /* ================= 최초 데이터 로드 ================= */
+  /* ===============================
+     📌 코인 상세 정보
+  =============================== */
   useEffect(() => {
-    async function fetchData() {
+    let mounted = true;
+
+    async function fetchDetail() {
       try {
-        // 📌 현재가
-        const detailRes = await axios.get("/api/search/price", {
-          params: { type: "CRYPTO", symbol: market }
-        });
-
-        // 📈 차트 (일봉)
-        const chartRes = await axios.get(`/api/crypto/candles/${market}`);
-
-        setDetail({
-          symbol: market,
-          name: market.replace("KRW-", ""),
-          market: "CRYPTO",
-          price: detailRes.data.price,
-          change:
-            (detailRes.data.changeRate >= 0 ? "+" : "") +
-            Number(detailRes.data.changeRate).toFixed(2) +
-            "%"
-        });
-
-        setPrevPrice(detailRes.data.price);
-
-        setChart(
-          chartRes.data.map((c) => ({
-            date: c.candle_date_time_kst.slice(0, 10),
-            price: c.trade_price
-          }))
+        const res = await axios.get(
+          `http://localhost:5000/api/crypto/detail/${market}`
         );
+        if (!mounted) return;
+        setDetail(res.data);
+        setError("");
       } catch (err) {
-        console.error(err);
+        console.error("❌ crypto detail error", err);
+        if (mounted) setError("코인 정보를 불러오지 못했습니다.");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     }
 
-    fetchData();
+    fetchDetail();
+    return () => {
+      mounted = false;
+    };
   }, [market]);
 
-  /* ================= ⚡ 실시간 현재가 폴링 (3초) ================= */
+  /* ===============================
+     ✅ 이미 관심종목인지 체크 (US와 동일)
+  =============================== */
   useEffect(() => {
-    if (!market) return;
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-    let timer;
-
-    const fetchPrice = async () => {
+    async function checkWatchlist() {
       try {
-        const res = await axios.get("/api/search/price", {
-          params: { type: "CRYPTO", symbol: market }
+        const res = await axios.get("http://localhost:5000/api/watchlist", {
+          headers: { Authorization: `Bearer ${token}` }
         });
 
-        const newPrice = res.data.price;
+        const exists = Array.isArray(res.data)
+          ? res.data.some(
+              (item) => item.symbol === market && item.market === "CRYPTO"
+            )
+          : false;
 
-        setDetail((prev) => {
-          if (!prev) return prev;
-
-          if (prevPrice !== null) {
-            if (newPrice > prevPrice) setPriceUp(true);
-            else if (newPrice < prevPrice) setPriceUp(false);
-          }
-
-          return {
-            ...prev,
-            price: newPrice,
-            change:
-              (res.data.changeRate >= 0 ? "+" : "") +
-              Number(res.data.changeRate).toFixed(2) +
-              "%"
-          };
-        });
-
-        setPrevPrice(newPrice);
-
-        // ✨ 깜빡임 리셋
-        setTimeout(() => setPriceUp(null), 600);
+        setAdded(exists);
       } catch (err) {
-        console.error("실시간 가격 실패", err);
+        console.error("❌ watchlist check failed", err);
       }
-    };
+    }
 
-    fetchPrice(); // 최초 1회
-    timer = setInterval(fetchPrice, 3000);
+    checkWatchlist();
+  }, [market]);
 
-    return () => clearInterval(timer);
-  }, [market, prevPrice]);
+  /* ===============================
+     📈 차트 데이터
+  =============================== */
+  const fetchChartByRange = useCallback(
+    async (range) => {
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/crypto/candles/${market}`,
+          { params: { range } }
+        );
 
-  /* ⭐ 관심종목 추가 */
-  const addToWatchlist = async () => {
+        // recharts: time은 number(timestamp)로 맞춤
+        return Array.isArray(res.data)
+          ? res.data.map((c) => ({
+              time: new Date(c.candle_date_time_kst).getTime(),
+              price: c.trade_price
+            }))
+          : [];
+      } catch (err) {
+        console.error("❌ chart fetch error", err);
+        return [];
+      }
+    },
+    [market]
+  );
+
+  /* ===============================
+     ⭐ 관심종목 추가 (버튼 회색 고정)
+  =============================== */
+  const addToWatchlist = useCallback(async () => {
     try {
       const token = localStorage.getItem("token");
-      if (!token) return setError("로그인이 필요합니다.");
+      if (!token) {
+        setError("로그인이 필요합니다.");
+        return;
+      }
+
+      if (!detail) {
+        setError("코인 정보가 없습니다.");
+        return;
+      }
 
       await axios.post(
         "http://localhost:5000/api/watchlist",
         {
-          symbol: detail.symbol,
-          name: detail.name,
+          symbol: detail.symbol || market, // KRW-XRP
+          name:
+            detail.nameKr
+              ? `${detail.nameKr} (${detail.code || market.replace("KRW-", "")})`
+              : detail.name || market.replace("KRW-", ""),
           market: "CRYPTO"
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
       );
 
       setAdded(true);
       setError("");
-    } catch {
+    } catch (err) {
+      console.error("❌ add watchlist failed", err);
       setError("이미 관심종목이거나 오류가 발생했습니다.");
     }
-  };
+  }, [detail, market]);
 
-  /* 📊 포트폴리오 등록 */
-  const addToPortfolio = async () => {
+  /* ===============================
+     📌 포트폴리오 추가 (AssetActions 규격)
+     - 성공: true
+     - 실패: 에러문자열
+  =============================== */
+  const addToPortfolio = async (qty, buy) => {
     const token = localStorage.getItem("token");
-    if (!token) return setMsg("로그인이 필요합니다.");
-    if (!qty || !buy) return setMsg("보유 수량과 매수가를 입력하세요.");
+    if (!token) return "로그인이 필요합니다.";
+
+    if (!detail) return "코인 정보가 없습니다.";
+
+    if (!qty || !buy || Number(qty) <= 0 || Number(buy) <= 0) {
+      return "보유 수량과 매수가를 올바르게 입력하세요.";
+    }
 
     try {
       await axios.post(
         "http://localhost:5000/api/portfolio",
         {
-          symbol: detail.symbol,
-          name: detail.name,
+          symbol: detail.symbol || market,     // KRW-XRP
+          name:
+            detail.nameKr
+              ? `${detail.nameKr}`
+              : detail.name || market.replace("KRW-", ""),
           market: "CRYPTO",
           quantity: Number(qty),
-          buyPrice: Number(buy)
+          buyPrice: Number(buy)                 // ⭐ 반드시 Number
         },
-        { headers: { Authorization: `Bearer ${token}` } }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`    // ⭐ 핵심
+          }
+        }
       );
 
-      setMsg("✅ 포트폴리오에 등록되었습니다.");
-      setTimeout(() => {
-        setPortfolioOpen(false);
-        setQty("");
-        setBuy("");
-        setMsg("");
-      }, 800);
-    } catch {
-      setMsg("이미 등록되었거나 오류가 발생했습니다.");
+      return true; // ⭐ AssetActions에서 성공 처리
+    } catch (err) {
+      console.error("❌ portfolio add error", err);
+      return (
+        err.response?.data?.message ||
+        "이미 등록되었거나 오류가 발생했습니다."
+      );
     }
   };
 
-  /* ================= 렌더 ================= */
+  /* ===============================
+     🔄 Render
+  =============================== */
   if (loading) return <div style={{ padding: 40 }}>로딩 중...</div>;
-  if (!detail) return <div>데이터 없음</div>;
+  if (!detail) return <div style={{ padding: 40 }}>데이터 없음</div>;
+
+  // 상단 타이틀: "엑스알피(리플) (XRP)" 형태로 보여주기
+  const code = detail.code || market.replace("KRW-", "");
+  const title =
+    detail.nameKrFull
+      ? detail.nameKrFull
+      : detail.nameKr
+      ? detail.nameKr
+      : market.replace("KRW-", "");
+
+  const isUp = typeof detail.change === "number" && detail.change > 0;
+  const isDown = typeof detail.change === "number" && detail.change < 0;
 
   return (
     <div style={{ padding: "40px", maxWidth: 1100, margin: "0 auto" }}>
-      <h1>
-        {detail.name} ({detail.symbol})
-      </h1>
-      <p>{detail.market}</p>
+      <h1>{title}</h1>
+      <p style={{ color: "#6b7280", marginTop: 6 }}>
+        가상자산 · 최근 조회 기준
+      </p>
 
-      {/* 실시간 가격 */}
-      <div
-        style={{
-          margin: "20px 0",
-          fontSize: 24,
-          fontWeight: 400,
-          transition: "all 0.3s ease",
-          color:
-            priceUp === null
-              ? "#111827"
-              : priceUp
-              ? "#16a34a"
-              : "#dc2626"
-        }}
-      >
-        현재가{" "}
-        <strong style={{ fontSize: 28 }}>
-          {detail.price.toLocaleString()}원
-        </strong>
+      {/* 상단 현재가/등락 (US 주식 스타일) */}
+      <div style={{ margin: "14px 0 18px", fontSize: 22 }}>
+        현재가: <strong>{Number(detail.price).toLocaleString()} 원</strong>
 
         <span
           style={{
-            marginLeft: 14,
-            fontSize: 16,
-            fontWeight: 500,
-            color: detail.change.startsWith("+")
-              ? "#16a34a"
-              : "#dc2626"
+            marginLeft: 12,
+            color: isUp ? "#16a34a" : isDown ? "#dc2626" : "#9ca3af"
           }}
         >
-          {detail.change}
+          {isUp && "▲ "}
+          {isDown && "▼ "}
+          {detail.change >= 0 ? "+" : ""}
+          {Math.abs(detail.change).toLocaleString()}{" "}
+          ({detail.rate >= 0 ? "+" : ""}
+          {Number(detail.rate).toFixed(2)}%)
         </span>
-      </div>  
-
-      {/* 📈 차트 */}
-      <div
-        style={{
-          width: "100%",
-          height: 320,
-          background: "#0b0e11",
-          borderRadius: 12,
-          padding: 20
-        }}
-      >
-        <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chart}>
-            <XAxis dataKey="date" tick={{ fill: "#9aa4b2" }} />
-            <YAxis tick={{ fill: "#9aa4b2" }} />
-            <Tooltip />
-            <Line
-              type="monotone"
-              dataKey="price"
-              stroke="#ff8a00"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ResponsiveContainer>
       </div>
 
-      {/* ⭐ 버튼 */}
-      <div style={{ marginTop: 30, display: "flex", gap: 12 }}>
-        <button
-          onClick={addToWatchlist}
-          disabled={added}
-          style={{
-            padding: "12px 20px",
-            borderRadius: 10,
-            background: added ? "#6b7280" : "#ff8a00",
-            border: "none",
-            fontWeight: 600,
-            color: "white"
-          }}
-        >
-          {added ? "⭐ 관심종목 추가됨" : "⭐ 관심종목 추가"}
-        </button>
-
-        <button
-          onClick={() => setPortfolioOpen(true)}
-          style={{
-            padding: "12px 20px",
-            borderRadius: 10,
-            background: "#1f2937",
-            border: "none",
-            fontWeight: 600,
-            color: "white"
-          }}
-        >
-          📊 포트폴리오 추가
-        </button>
-      </div>
+      <AssetActions
+        fetchChart={fetchChartByRange}
+        chartColor="#ff8a00"
+        price={detail.price}
+        prevPrice={detail.prevPrice}
+        change={detail.change}
+        rate={detail.rate}
+        open={detail.open}
+        high={detail.high}
+        low={detail.low}
+        volume={detail.volume}
+        high52={detail.high52}
+        low52={detail.low52}
+        added={added}
+        disabled={false}
+        onAddWatch={addToWatchlist}
+        onAddPortfolio={addToPortfolio}
+        defaultRange="1d"
+      />
 
       {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
-
-      {/* 📊 모달 */}
-      {portfolioOpen && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.65)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 2000
-          }}
-        >
-          <div
-            style={{
-              width: 360,
-              background: "#0b0e11",
-              borderRadius: 14,
-              padding: 24,
-              color: "white"
-            }}
-          >
-            <h3>📊 포트폴리오 추가</h3>
-
-            <input
-              type="number"
-              placeholder="보유 수량"
-              value={qty}
-              onChange={(e) => setQty(e.target.value)}
-              style={{ width: "100%", marginTop: 12 }}
-            />
-            <input
-              type="number"
-              placeholder="매수가"
-              value={buy}
-              onChange={(e) => setBuy(e.target.value)}
-              style={{ width: "100%", marginTop: 12 }}
-            />
-
-            {msg && <p style={{ color: "#22c55e" }}>{msg}</p>}
-
-            <div style={{ marginTop: 20, textAlign: "right" }}>
-              <button onClick={() => setPortfolioOpen(false)}>취소</button>
-              <button onClick={addToPortfolio}>추가</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

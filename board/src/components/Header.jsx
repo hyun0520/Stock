@@ -1,20 +1,19 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./Header.css";
+import "../styles/Header.css";
 
 export default function Header({ setIsAuth, isAuth }) {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("user"));
-
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [searchItems, setSearchItems] = useState([]);
   const [recentItems, setRecentItems] = useState([]);
   const [prices, setPrices] = useState({});
   const [activeIndex, setActiveIndex] = useState(-1);
-
   const listRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false); // 모바일 메뉴
 
   /* ===============================
      최근 검색 로드
@@ -26,7 +25,7 @@ export default function Header({ setIsAuth, isAuth }) {
   }, []);
 
   /* ===============================
-     🔍 검색
+     검색
   =============================== */
   useEffect(() => {
     if (!searchOpen) return;
@@ -54,7 +53,7 @@ export default function Header({ setIsAuth, isAuth }) {
   }, [query, searchOpen]);
 
   /* ===============================
-     💰 가격 로드
+     가격 로드
   =============================== */
   useEffect(() => {
     searchItems.slice(0, 10).forEach(async (item) => {
@@ -93,7 +92,7 @@ export default function Header({ setIsAuth, isAuth }) {
   };
 
   /* ===============================
-     🗑️ 최근 검색 개별 삭제
+     최근 검색 개별 삭제
   =============================== */
   const removeRecentItem = (symbol, type) => {
     const updated = recentItems.filter(
@@ -108,7 +107,7 @@ export default function Header({ setIsAuth, isAuth }) {
   };
 
   /* ===============================
-     🧹 최근 검색 전체 삭제
+     최근 검색 전체 삭제
   =============================== */
   const clearRecentItems = () => {
     if (!window.confirm("최근 검색을 모두 삭제할까요?")) return;
@@ -216,6 +215,12 @@ export default function Header({ setIsAuth, isAuth }) {
     const price = prices[item.symbol];
     const isRecent = query === "";
 
+    // ⭐ 국내주식(KR)만 "보통주" 제거해서 표시
+    const displayName =
+      item.type === "KR"
+        ? item.name.replace(/보통주/g, "").trim()
+        : item.name;
+
     return (
       <div
         className={`result-item ${
@@ -228,12 +233,13 @@ export default function Header({ setIsAuth, isAuth }) {
           justifyContent: "space-between"
         }}
       >
+        {/* 왼쪽: 종목 정보 */}
         <div
           onClick={() => handleSelectItem(item)}
           style={{ cursor: "pointer" }}
         >
           <strong>
-            {item.name} ({item.symbol})
+            {displayName} ({item.symbol})
           </strong>
           <div className="asset-type">
             {item.type === "CRYPTO"
@@ -244,24 +250,31 @@ export default function Header({ setIsAuth, isAuth }) {
           </div>
         </div>
 
-        <div style={{ textAlign: "right" }}>
+        {/* 오른쪽: 가격 + 퍼센트 + X */}
+        <div className="result-right">
           {price && (
-            <>
+            <div className="price-wrap">
               <div
-                style={{
-                  color:
-                    price.changeRate >= 0
-                      ? "#ef4444"
-                      : "#3b82f6"
-                }}
+                className={
+                  price.changeRate >= 0
+                    ? "price-up"
+                    : "price-down"
+                }
               >
                 {price.price.toLocaleString()}
               </div>
-              <div style={{ fontSize: 12 }}>
+              <div
+                className={
+                  price.changeRate >= 0
+                    ? "price-up"
+                    : "price-down"
+                }
+                style={{ fontSize: 13 }}
+              >
                 {price.changeRate >= 0 ? "+" : ""}
                 {price.changeRate.toFixed(2)}%
               </div>
-            </>
+            </div>
           )}
 
           {isRecent && (
@@ -272,20 +285,25 @@ export default function Header({ setIsAuth, isAuth }) {
                 removeRecentItem(item.symbol, item.type);
               }}
             >
-              X
+              ×
             </button>
           )}
         </div>
       </div>
     );
   };
-
+  /* 모바일 로그아웃 처리 */
   const handleLogout = () => {
     localStorage.clear();
     setIsAuth(false);
+    setMenuOpen(false);
     navigate("/login");
   };
-
+  /* 모바일 메뉴 먼저 닫고 페이지 이동 */
+  const handleMenuNavigate = (path) => {
+    setMenuOpen(false);      
+    navigate(path);         
+  };
   return (
     <>
       <header className="header">
@@ -298,7 +316,7 @@ export default function Header({ setIsAuth, isAuth }) {
           />
         </div>
 
-        <nav className="header-menu">
+        <nav className="header-menu desktop-only">
           <span onClick={() => navigate("/dashboard")}>
             대시보드
           </span>
@@ -311,7 +329,7 @@ export default function Header({ setIsAuth, isAuth }) {
           <span>도움말</span>
         </nav>
 
-        <div className="header-right">
+        <div className="header-right desktop-only">
           <button
             className="icon-btn"
             onClick={() => {
@@ -321,14 +339,15 @@ export default function Header({ setIsAuth, isAuth }) {
           >
             🔍
           </button>
-
           {isAuth ? (
             <>
               <button
+                className="user-btn"
                 onClick={() => navigate("/profile")}
               >
                 {user?.username}
               </button>
+
               <button
                 className="logout-btn"
                 onClick={handleLogout}
@@ -353,7 +372,59 @@ export default function Header({ setIsAuth, isAuth }) {
             </>
           )}
         </div>
+        <div className="mobile-actions mobile-only">
+          <button
+            className="icon-btn"
+            onClick={() => {
+              setSearchOpen(true);
+              setQuery("");
+            }}
+          >
+            🔍
+          </button>
+          {/* 모바일 메뉴 버튼 */}
+          <button
+            className="menu-btn"
+            onClick={() => setMenuOpen(true)}
+          >
+            ☰
+          </button>
+        </div>
       </header>
+      {menuOpen && (
+        <div
+          className="drawer-overlay"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+      
+      <div className={`mobile-drawer ${menuOpen ? "open" : ""}`}>
+        <div className="drawer-header">
+          <span>MENU</span>
+          <button onClick={() => setMenuOpen(false)}>✕</button>
+        </div>
+
+        <div className="drawer-nav">
+          <span onClick={() => handleMenuNavigate("/dashboard")}>대시보드</span>
+          <span onClick={() => handleMenuNavigate("/watchlist")}>관심종목</span>
+          <span onClick={() => handleMenuNavigate("/portfolio")}>포트폴리오</span>
+          <span onClick={() => handleMenuNavigate("/dashboard")}>도움말</span>
+          <span onClick={() => handleMenuNavigate("/profile")}>내 정보</span>
+
+          <hr />
+
+          {isAuth ? (
+            <span className="danger" onClick={handleLogout}>
+              로그아웃
+            </span>
+          ) : (
+            <>
+              <span onClick={() => navigate("/login")}>로그인</span>
+              <span onClick={() => navigate("/register")}>회원가입</span>
+            </>
+          )}
+        </div>
+      </div>
 
       {searchOpen && (
         <>
@@ -383,12 +454,12 @@ export default function Header({ setIsAuth, isAuth }) {
                     display: "flex",
                     justifyContent: "space-between",
                     padding: "8px 12px",
-                    fontSize: 12,
+                    fontSize: 21,
                     color: "#9aa4b2",
                     borderBottom: "1px solid rgba(255,255,255,0.08)"
                   }}
                 >
-                  <span>🕘 최근 검색</span>
+                  <span>최근검색</span>
                   <button
                     onClick={clearRecentItems}
                     style={{
@@ -396,7 +467,7 @@ export default function Header({ setIsAuth, isAuth }) {
                       border: "none",
                       color: "#ef4444",
                       cursor: "pointer",
-                      fontSize: 12
+                      fontSize: 14
                     }}
                   >
                     전체 삭제
@@ -404,10 +475,10 @@ export default function Header({ setIsAuth, isAuth }) {
                 </div>
               )}
 
-              {/* 🇰🇷 국내주식 */}
+              {/* 국내주식 */}
               {grouped.KR.length > 0 && (
                 <>
-                  <SectionTitle label="🇰🇷 국내주식" />
+                  <SectionTitle label="국내주식" />
                   {grouped.KR.map((item) => (
                     <SearchItem
                       key={`KR-${item.symbol}`}
@@ -417,10 +488,10 @@ export default function Header({ setIsAuth, isAuth }) {
                 </>
               )}
 
-              {/* 🇺🇸 미국주식 */}
+              {/* 미국주식 */}
               {grouped.US.length > 0 && (
                 <>
-                  <SectionTitle label="🇺🇸 미국주식" />
+                  <SectionTitle label="미국주식" />
                   {grouped.US.map((item) => (
                     <SearchItem
                       key={`US-${item.symbol}`}
@@ -430,10 +501,10 @@ export default function Header({ setIsAuth, isAuth }) {
                 </>
               )}
 
-              {/* 🪙 가상화폐 */}
+              {/* 가상화폐 */}
               {grouped.CRYPTO.length > 0 && (
                 <>
-                  <SectionTitle label="🪙 가상화폐" />
+                  <SectionTitle label="가상화폐" />
                   {grouped.CRYPTO.map((item) => (
                     <SearchItem
                       key={`CRYPTO-${item.symbol}`}

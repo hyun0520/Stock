@@ -2,8 +2,8 @@
   width: 100%;
   background: #ffffff;
   border-top: 1px solid #e5e7eb;
-  padding: 30px 0;
-  margin-top: 80px;
+  padding: 40px 0;
+  
 }
 
 .footer-inner {
@@ -17,7 +17,6 @@
   gap: 24px;
 }
 
-/* 링크 (윗줄) */
 .footer-links {
   font-size: 13px;
   color: #374151;
@@ -38,10 +37,10 @@
   color: #9ca3af;
 }
 
-/* 🔽 회사 정보 (아래 줄) */
+/* 회사 정보 */
 .footer-info {
-  display: block;        /* 핵심 */
-  margin-top: 8px;       /* 줄 내려주는 포인트 */
+  display: block;       
+  margin-top: 8px;     
   font-size: 12px;
   color: #6b7280;
   line-height: 1.6;
@@ -75,7 +74,24 @@
   margin-top: 5px;
 }
 
-/* 반응형 */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+
+/* 전체 레이아웃 */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* footer 바닥고정 */
+.app-main {
+  flex: 1;
+}
+
+/*모바일 반응형*/
 @media (max-width: 768px) {
   .footer-inner {
     flex-direction: column;
@@ -85,5 +101,46 @@
   .footer-right {
     margin-left: 0;
     margin-top: 10px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  .footer-inner {
+    padding: 0 16px;
+    gap: 16px;
+  }
+
+  .footer-links {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .footer-info {
+    font-size: 11.5px;
+    line-height: 1.5;
+  }
+
+  .related-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+}
+
+/* ===============================
+   Mobile bottom spacing fix
+================================ */
+@media (max-width: 768px) {
+
+  /* 환율 섹션 아래 여백 제거 */
+  .fx-section {
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  /* footer 자체 여백 최소화 */
+  .site-footer {
+    margin-top: 0;
+    padding: 20px 0;
   }
 }

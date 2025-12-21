@@ -30,7 +30,7 @@ function App() {
         <Header setIsAuth={setIsAuth} isAuth={isAuth} />
       )}
 
-      {/* 🔽 핵심: main이 남은 공간을 차지 */}
+      
       <main className="app-main">
         <Routes>
           {/* 공개 페이지 */}
@@ -96,7 +96,6 @@ function App() {
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
-
       <Footer />
     </div>
   );

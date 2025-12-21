@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -19,11 +19,25 @@ export default function Register({ setIsAuth }) {
 
   const navigate = useNavigate();
 
-  /* 이메일 형식 체크 */
+  /* ===============================
+     🔥 회원가입 페이지에서만 footer 숨김
+  =============================== */
+  useEffect(() => {
+    document.body.classList.add("hide-footer");
+    return () => {
+      document.body.classList.remove("hide-footer");
+    };
+  }, []);
+
+  /* ===============================
+     이메일 형식 체크
+  =============================== */
   const isValidEmail = (value) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
-  /* 🔍 아이디 입력 시 실시간 중복 체크 */
+  /* ===============================
+     🔍 아이디 입력 시 실시간 중복 체크
+  =============================== */
   const handleUsernameChange = async (e) => {
     const value = e.target.value;
     setUsername(value);
@@ -52,8 +66,10 @@ export default function Register({ setIsAuth }) {
     }
   };
 
+  /* ===============================
+     회원가입 처리
+  =============================== */
   const handleRegister = async () => {
-    
     if (!username || usernameAvailable === false) {
       setMsg("아이디를 다시 확인해주세요");
       return;
@@ -122,11 +138,7 @@ export default function Register({ setIsAuth }) {
           placeholder="닉네임"
         />
         {usernameMsg && (
-          <p
-            className={
-              usernameAvailable ? "msg-success" : "msg-error"
-            }
-          >
+          <p className={usernameAvailable ? "msg-success" : "msg-error"}>
             {usernameMsg}
           </p>
         )}
@@ -151,14 +163,21 @@ export default function Register({ setIsAuth }) {
             <option value="">년</option>
             {Array.from({ length: 100 }, (_, i) => {
               const y = new Date().getFullYear() - i;
-              return <option key={y} value={y}>{y}</option>;
+              return (
+                <option key={y} value={y}>
+                  {y}
+                </option>
+              );
             })}
           </select>
 
           <select value={month} onChange={(e) => setMonth(e.target.value)}>
             <option value="">월</option>
             {Array.from({ length: 12 }, (_, i) => (
-              <option key={i + 1} value={String(i + 1).padStart(2, "0")}>
+              <option
+                key={i + 1}
+                value={String(i + 1).padStart(2, "0")}
+              >
                 {i + 1}
               </option>
             ))}
@@ -167,7 +186,10 @@ export default function Register({ setIsAuth }) {
           <select value={day} onChange={(e) => setDay(e.target.value)}>
             <option value="">일</option>
             {Array.from({ length: 31 }, (_, i) => (
-              <option key={i + 1} value={String(i + 1).padStart(2, "0")}>
+              <option
+                key={i + 1}
+                value={String(i + 1).padStart(2, "0")}
+              >
                 {i + 1}
               </option>
             ))}

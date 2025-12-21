@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    // ✅ Frankfurter API
+   
     const response = await axios.get(
       "https://api.frankfurter.app/latest?from=KRW"
     );
@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
     res.json({
       USD: {
         rate: Number(usd.toFixed(2)),
-        change: 0.22   // 임시
+        change: 0.22 
       },
       JPY: {
         rate: Number(jpy.toFixed(2)),

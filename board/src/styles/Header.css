@@ -1,7 +1,7 @@
 /* ================= Variables ================= */
 :root {
-  --bg-header-top: #0b0e11;
-  --bg-header-bottom: #0f141c;
+--bg-header-top: #141a22;
+--bg-header-bottom: #1b2430;
   --bg-dark: #1a2230;
 
   --accent: #ff8a00;
@@ -124,29 +124,39 @@
     box-shadow 0.15s ease;
 }
 
+/* ================= Auth Buttons (로그인 전) ================= */
+
+/* 로그인 버튼 */
 .login-btn {
-  background: #1f2937;
-  color: white;
+  background: linear-gradient(135deg, #ff8a00, #ffb347);
+  color: #ffffff;
   border: none;
+  box-shadow: none;            
+  transition:
+    background 0.2s ease,
+    transform 0.12s ease;
 }
 
 .login-btn:hover {
-  background: #2b3646;
   transform: translateY(-2px);
 }
 
+/* 가입하기 버튼 */
 .signup-btn {
-  background: var(--accent);
-  color: white;
+  background: linear-gradient(135deg, #ff8a00);
+  color: #ffffff;
   border: none;
+  box-shadow: none;
+  transition:
+    background 0.2s ease,
+    transform 0.12s ease;
 }
 
 .signup-btn:hover {
-  background: var(--accent-hover);
   transform: translateY(-2px);
 }
 
-/* ================= SEARCH MODAL UI (ADD ONLY) ================= */
+/* ================= SEARCH MODAL UI ================= */
 
 /* dim overlay */
 .search-overlay {
@@ -308,13 +318,175 @@
 .recent-remove-btn {
   background: none;
   border: none;
-  color: #9aa4b2;        /* 기본 회색 */
+  color: #9aa4b2; 
   cursor: pointer;
-  font-size: 16px;
+  font-size: 23px;
   transition: color 0.2s ease;
 }
 
 .recent-remove-btn:hover {
-  color: #ef4444;        /* 🔥 hover 시만 빨간색 */
+  color: #ef4444;        
 }
 
+/* ===== Search result right alignment ===== */
+
+.result-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 가격 + 퍼센트 묶음 */
+.price-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 80px; /* 숫자 흔들림 방지 */
+  font-size: 16px;
+}
+
+/* X 버튼 */
+.recent-remove-btn {
+  margin-left: 10px;
+  line-height: 1;
+}
+
+
+/* ================= Logged-in User ================= */
+
+.user-btn {
+  background: linear-gradient(135deg, #ff8a00);
+  color: #ffffff;
+  border: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.user-btn:hover {
+  transform: translateY(-2px);
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, #ef4444);
+  color: #ffffff;
+  border: none;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.logout-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* ================= MOBILE HEADER ================= */
+.mobile-only {
+  display: none;
+}
+
+.desktop-only {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header {
+    justify-content: space-between;
+    padding: 12px 16px;
+  }
+
+  .logo {
+    height: 44px;
+  }
+}
+
+/* ================= MOBILE DRAWER ================= */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.14);
+  z-index: 900;
+}
+
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: -260px;
+  width: 260px;
+  height: 100vh;
+  background: #0b0e11;
+  color: white;
+  z-index: 1000;
+  transition: right 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-drawer.open {
+  right: 0;
+}
+
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.drawer-header button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+}
+
+.drawer-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+}
+
+.drawer-nav span {
+  padding: 14px 10px;
+  font-size: 15px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.drawer-nav span:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+.drawer-nav .danger {
+  color: #ef4444;
+}
+
+.drawer-nav hr {
+  border: none;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  margin: 12px 0;
+}
+
+.menu-btn {
+  font-size: 22px;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .logo {
+    height: 55px;
+  }
+}

@@ -1,13 +1,15 @@
+// server/controllers/crypto.js
 import axios from "axios";
 import {
   getCryptoPrice,
-  getCryptoCandles as fetchCandlesFromService
+  getCryptoCandlesByRange,
+  getCryptoDetail
 } from "../services/crypto.js";
 
-/* ⚡ 현재가 조회 */
+/* ⚡ 현재가 */
 export const fetchCryptoPrice = async (req, res) => {
   try {
-    const { market } = req.params; // KRW-BTC
+    const { market } = req.params;
     const data = await getCryptoPrice(market);
     res.json(data);
   } catch (err) {
@@ -15,7 +17,7 @@ export const fetchCryptoPrice = async (req, res) => {
   }
 };
 
-/* 📈 마켓 목록 */
+/* 📊 마켓 목록 */
 export const getCryptoMarkets = async (req, res) => {
   try {
     const response = await axios.get(
@@ -27,20 +29,31 @@ export const getCryptoMarkets = async (req, res) => {
     );
 
     res.json(krwMarkets);
-  } catch (err) {
+  } catch {
     res.status(500).json({ message: "Failed to fetch markets" });
   }
 };
 
-/* 📊 캔들 데이터 */
+/* 📈 기간별 캔들 */
 export const fetchCryptoCandles = async (req, res) => {
   try {
     const { market } = req.params;
+    const { range } = req.query;
 
-    const data = await fetchCandlesFromService(market);
-
+    const data = await getCryptoCandlesByRange(market, range);
     res.json(data.reverse());
-  } catch (err) {
+  } catch {
     res.status(500).json({ message: "Failed to fetch candles" });
+  }
+};
+
+/* 🧠 코인 상세 */
+export const fetchCryptoDetail = async (req, res) => {
+  try {
+    const { market } = req.params;
+    const data = await getCryptoDetail(market);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

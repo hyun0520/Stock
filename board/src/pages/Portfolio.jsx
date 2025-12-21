@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import "../styles/global.css";
+import "../styles/Portfolio.css";
 import { fetchCryptoPrice } from "../services/crypto";
 
 import {
@@ -20,8 +20,9 @@ export default function Portfolio() {
 
   const [editId, setEditId] = useState(null);
   const [qty, setQty] = useState("");
-  const [price, setPrice] = useState(""); // 🔹 US는 달러 입력
-
+  const [price, setPrice] = useState(""); // US는 달러 입력
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
   // 현재가 저장 (id → price, 원화 기준)
   const [priceMap, setPriceMap] = useState({});
 
@@ -229,7 +230,6 @@ export default function Portfolio() {
       </div>
     </div>
 
-
       {/* 차트 */}
       <div className="portfolio-chart-wrap">
         <h3>보유자산</h3>
@@ -237,7 +237,7 @@ export default function Portfolio() {
         <div className="portfolio-chart-row">
           {/* 왼쪽: 도넛 차트 */}
           <div className="chart-box">
-            <ResponsiveContainer width={260} height={260}>
+            <ResponsiveContainer width={290} height={290}>
               <PieChart>
                 <Pie
                   data={pieData}
@@ -332,7 +332,7 @@ export default function Portfolio() {
                 <span>매수가: {item.buyPrice.toLocaleString()}원</span>
                 <span>
                   현재가:{" "}
-                  <strong style={{ color: isPlus ? "#16a34a" : "#dc2626" }}>
+                  <strong>
                     {current.toLocaleString()}원
                   </strong>
                 </span>

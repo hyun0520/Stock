@@ -1,7 +1,7 @@
-import "./Dashboard.css";
+import axios from "axios";
+import "../styles/Dashboard.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { fetchCryptoPrice } from "../services/crypto";
 
 import {
@@ -43,7 +43,11 @@ export default function Dashboard() {
   const [totalAsset, setTotalAsset] = useState(0);
   const [totalProfit, setTotalProfit] = useState(0);
   const [totalRate, setTotalRate] = useState(0);
-
+  /* ================= Asset present ================= */
+  const formatKRW = (value) => {
+    if (typeof value !== "number") return "-";
+    return `${value.toLocaleString()}원`;
+  };
   /* ================= FX ================= */
   const [fx, setFx] = useState(null);
 
@@ -166,18 +170,29 @@ export default function Dashboard() {
         </div>
       </section>
 
+      {/* ===== MOBILE MARKET ===== */}
+      <section className="market-mobile-wrap">
+        <h2 className="market-mobile-title">MARKET INDEX</h2>
+        <div className="market-mobile">
+          <MarketRow title="S&P 500" data={sp500} />
+          <MarketRow title="NASDAQ" data={nasdaq} />
+          <MarketRow title="KOSPI" data={kospi} />
+          <MarketRow title="KOSDAQ" data={kosdaq} />
+        </div>
+      </section>
+
       {/* ===== ASSET ===== */}
       <section className="asset-section">
         <div className="asset-left">
 
           <div className="asset-card">
             <span className="label">총 자산</span>
-            <strong className="value">
-              ₩{totalAsset.toLocaleString()}
-            </strong>
+              <strong className="value">
+                {formatKRW(totalAsset)}
+              </strong>
             <span className={`sub ${totalProfit >= 0 ? "plus" : "minus"}`}>
               총 손익 {totalProfit >= 0 ? "+" : ""}
-              ₩{totalProfit.toLocaleString()} ({totalRate.toFixed(2)}%)
+              {formatKRW(totalProfit)} ({totalRate.toFixed(2)}%)
             </span>
           </div>
 
@@ -198,7 +213,7 @@ export default function Dashboard() {
               return (
                 <div key={item._id} className="portfolio-mini-row">
                   <span className="name">{item.name}</span>
-                  <span className="eval">₩{evalAmount.toLocaleString()}</span>
+                  <span className="eval">{formatKRW(evalAmount)}</span>
                   <span className={`rate ${rate >= 0 ? "plus" : "minus"}`}>
                     {rate >= 0 ? "▲" : "▼"} {Math.abs(rate).toFixed(2)}%
                   </span>
@@ -275,6 +290,7 @@ function MarketChart({ title, data }) {
         <span className={`main-price ${diff >= 0 ? "up" : "down"}`}>
           {last.value.toLocaleString()}
         </span>
+
         <span className={`price-diff ${diff >= 0 ? "up" : "down"}`}>
           {diff >= 0 ? "▲" : "▼"} {Math.abs(diff).toFixed(2)} ({rate}%)
         </span>
@@ -345,3 +361,39 @@ function FxCard({ title, value, diff }) {
   );
 }
 
+/* ================= 모바일용 ================= */
+function MarketRow({ title, data }) {
+  if (!data || data.length < 2) return null;
+
+  const last = data[data.length - 1];
+  const prev = data[data.length - 2];
+  const diff = last.value - prev.value;
+  const rate = ((diff / prev.value) * 100).toFixed(2);
+  const isUp = diff >= 0;
+
+  return (
+    <div className="market-mini-card">
+      <span className="market-name">{title}</span>
+
+      <strong className={`market-value ${isUp ? "up" : "down"}`}>
+        {last.value.toLocaleString()}
+      </strong>
+
+      <span className={`market-rate ${isUp ? "up" : "down"}`}>
+        {isUp ? "+" : ""}{rate}%
+      </span>
+
+      {/* 🔥 미니 차트 */}
+      <ResponsiveContainer width="100%" height={36}>
+        <LineChart data={data}>
+          <Line
+            dataKey="value"
+            dot={false}
+            stroke={isUp ? "#16a34a" : "#dc2626"}
+            strokeWidth={2}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}

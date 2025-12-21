@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./Watchlist.css";
+import "../styles/Watchlist.css";
+
 
 const USD_TO_KRW = 1474;
-
 export default function Watchlist() {
   const [list, setList] = useState([]);
   const [prices, setPrices] = useState({});
   const [rateMap, setRateMap] = useState({});
   const [prevPrices, setPrevPrices] = useState({});
   const [loading, setLoading] = useState(true);
-
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
@@ -121,7 +120,7 @@ export default function Watchlist() {
   if (loading) return <div style={{ padding: 40 }}>로딩 중...</div>;
 
   return (
-    <div style={{ padding: 40, maxWidth: 1000, margin: "0 auto" }}>
+    <div className="watchlist-wrap">
       <h1 style={{ marginBottom: 20 }}>MY LIST</h1>
 
       {list.map((item) => {

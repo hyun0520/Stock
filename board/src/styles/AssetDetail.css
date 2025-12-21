@@ -1,0 +1,376 @@
+/* ===============================
+   Asset Actions
+================================ */
+
+/* ===== Modal Overlay ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(2px);
+  z-index: 900;
+}
+
+/* ===== Portfolio Modal ===== */
+.portfolio-modal {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 320px;
+
+  background: linear-gradient(
+    180deg,
+    rgba(20,26,34,0.95),
+    rgba(27,36,48,0.95)
+  );
+
+  border-radius: 16px;
+  padding: 20px;
+  z-index: 1000;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.75);
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+/* ===== Modal Fields ===== */
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.modal-field label {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.modal-field input,
+.portfolio-modal input {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  background: #1f2937;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+/* ===== Modal Buttons ===== */
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: #374151;
+  color: #e5e7eb;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-confirm {
+  flex: 1;
+  height: 40px;
+  border-radius: 12px;
+  border: none;
+  background: #ff8a00;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-confirm:hover {
+  background: #ff9b1a;
+}
+
+/* ===== Modal Message ===== */
+.portfolio-msg {
+  margin-top: 10px;
+  font-size: 13px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.portfolio-msg.success {
+  color: #22c55e;
+}
+
+.portfolio-msg.error {
+  color: #ef4444;
+}
+
+/* ===============================
+   Chart Card
+================================ */
+.asset-chart {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 20px 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+}
+
+/* ===== Range Tabs ===== */
+.range-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.range-tabs button {
+  padding: 6px 14px;
+  font-size: 14px;
+  border-radius: 999px;
+  border: none;
+  background: #f3f4f6;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.range-tabs button:hover {
+  background: #e5e7eb;
+}
+
+.range-tabs button.active {
+  background: #111827;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+/* ===== Chart Area ===== */
+.chart-box {
+  height: 320px;
+}
+
+/* ===============================
+   Asset Summary
+================================ */
+.asset-summary {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 24px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+}
+
+.summary-row .label {
+  color: #6b7280;
+}
+
+/* 오른쪽 값 공통 */
+.summary-row span:not(.label) {
+  font-weight: 500;
+  color: #111827;
+}
+
+/* 상승 / 하락 */
+.up {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.down {
+  color: #2563eb;
+  font-weight: 600;
+}
+
+/* strong 완전 무력화 */
+.summary-row strong {
+  font-size: 15px;
+  font-weight: 500;
+  color: #111827;
+}
+
+/* ===============================
+   Buttons
+================================ */
+.stock-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.watch-btn,
+.portfolio-btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  border: none;
+  cursor: pointer;
+
+  font-family: inherit;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.watch-btn {
+  background: #ff8a00;
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.portfolio-btn {
+  background: #111827;
+  color: #ffffff;
+}
+
+.watch-btn.added,
+.watch-btn:disabled {
+  background: linear-gradient(180deg, #4b4f55);
+  color: #ffffff;
+  cursor: not-allowed;
+  font-weight: 600;
+}
+/* ===============================
+   📦 Chart Tooltip Box
+================================ */
+.chart-tooltip {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px 10px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  font-size: 12px;
+  line-height: 1.4;
+  pointer-events: none;
+}
+
+.tooltip-date {
+  color: #6b7280;
+  margin-bottom: 2px;
+}
+
+.tooltip-price {
+  color: #ff8a00;
+  font-weight: 700;
+}
+
+/* ===============================
+   📏 Prev Price Box
+================================ */
+.chart-prev-box {
+  background: #f3f4f6;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #374151;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  pointer-events: none;
+}
+
+/* ===============================
+   📱 Mobile Optimization
+================================ */
+@media (max-width: 768px) {
+  .asset-chart {
+    margin-left: -26px;
+    margin-right: -26px;
+    border-radius: 0;
+  }
+  .asset-summary {
+    margin-left: -26px;
+    margin-right: -26px;
+    border-radius: 14px 14px 14px 14px;
+  }
+}
+
+@media (max-width: 768px) {
+
+  /* 전일대비(up/down)는 색상 유지 + 조금 더 유연 */
+  .summary-row .up,
+  .summary-row .down {
+    font-size: clamp(11px, 3.4vw, 14px);
+    max-width: 130px;
+  }
+
+}
+
+@media (max-width: 768px) {
+
+  .asset-chart {
+    padding: 12px 1px;   
+    margin-bottom: 10px;
+    border-radius: 14px;
+    padding-bottom: 0px;
+  }
+
+  .chart-box {
+    height: 170px; 
+  }
+
+  .range-tabs {
+    display: flex;
+    justify-content: center;     /* 👈 가운데 정렬 핵심 */
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+  }
+  .range-tabs::-webkit-scrollbar {
+    display: none; /* 모바일에서 스크롤바 숨김 */
+  }
+  .range-tabs button {  
+    padding: 8px 10px;
+    font-size: 11px;
+    margin-bottom: 5px;
+  }
+
+  .asset-summary {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px 16px;
+    padding: 16px;
+  }
+
+  .summary-row {
+    font-size: 14px;
+  }
+
+  .summary-row .label {
+    font-size: 12px;
+  }
+
+  .summary-row span:not(.label) {
+    font-size: clamp(9px, 3.6vw, 12px);
+    line-height: 1.2;
+    white-space: nowrap;
+    max-width: 110px;         
+    text-align: right;
+  }
+
+  .watch-btn,
+  .portfolio-btn {
+    font-size: 14px;
+    padding: 14px;
+  }
+
+  .portfolio-modal {
+    width: calc(90% - 32px);
+    max-width: 360px;
+  }
+}
