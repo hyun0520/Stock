@@ -4,9 +4,9 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 
 // ===============================
-// 🔥 ENV (Render 전용)
+// 🔥 ENV
 // ===============================
-dotenv.config(); // ✅ 이것만 사용
+dotenv.config(); // Render / Local 공용
 
 // ===============================
 // 🔥 Routes
@@ -28,26 +28,24 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ===============================
+// 🔥 Middleware (⚠️ 순서 중요)
+// ===============================
+app.use(cors());              // ⭐ 기본 CORS (문제 최소화)
+app.use(express.json());      // ⭐ body parser
+
+// ===============================
 // 🔥 MongoDB
 // ===============================
-console.log("ENV CHECK:", process.env.MONGO_URI);
+console.log("🔍 MONGO_URI:", process.env.MONGO_URI);
 
 mongoose
   .connect(process.env.MONGO_URI)
-  .then(() => console.log("🔥 MongoDB Connected"))
+  .then(() => {
+    console.log("🔥 MongoDB Connected");
+  })
   .catch((err) => {
-    console.error("❌ MongoDB Error:", err);
-    process.exit(1); // ❗ 연결 실패하면 서버 종료
+    console.error("❌ MongoDB Connection Error:", err);
   });
-
-// ===============================
-// 🔥 Middleware
-// ===============================
-
-// ✅ 일단 CORS 전체 허용 (문제 해결 후 제한)
-app.use(cors());
-
-app.use(express.json());
 
 // ===============================
 // 🔥 API Routes
@@ -64,10 +62,10 @@ app.use("/api/market", marketRouter);
 app.use("/api/fx", fxRoutes);
 
 // ===============================
-// 🔥 Health Check (중요)
+// 🔥 Health Check
 // ===============================
 app.get("/", (req, res) => {
-  res.send("✅ Server Running");
+  res.send("Server Running");
 });
 
 // ===============================
