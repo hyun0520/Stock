@@ -1,4 +1,4 @@
-import axios from "axios";
+import { api } from "../services/api";
 import "../styles/Dashboard.css";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -53,19 +53,19 @@ export default function Dashboard() {
 
   /* ================= INDEX ================= */
   useEffect(() => {
-    axios.get("http://localhost:5000/api/market/index/kospi")
+    api.get("/api/market/index/kospi")
       .then(res => setKospi(res.data))
       .catch(() => setKospi(marketData));
 
-    axios.get("http://localhost:5000/api/market/index/kosdaq")
+    api.get("/api/market/index/kosdaq")
       .then(res => setKosdaq(res.data))
       .catch(() => setKosdaq(marketData));
 
-    axios.get("http://localhost:5000/api/market/index/nasdaq")
+    api.get("/api/market/index/nasdaq")
       .then(res => setNasdaq(res.data))
       .catch(() => setNasdaq(marketData));
 
-    axios.get("http://localhost:5000/api/market/index/sp500")
+    api.get("/api/market/index/sp500")
       .then(res => setSp500(res.data))
       .catch(() => setSp500(marketData));
   }, []);
@@ -75,11 +75,12 @@ export default function Dashboard() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    axios.get("http://localhost:5000/api/portfolio", {
+    api.get("/api/portfolio", {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => setPortfolio(res.data));
   }, []);
 
+  
   /* ================= CURRENT PRICE ================= */
   useEffect(() => {
     if (!portfolio.length) return;
@@ -94,19 +95,18 @@ export default function Dashboard() {
           if (market === "CRYPTO") {
             const data = await fetchCryptoPrice(item.symbol);
             prices[item._id] = data.price;
-          } else if (market === "US") {
-            const res = await axios.get(
-              `http://localhost:5000/api/usStock/${item.symbol}`
-            );
+          } 
+          else if (market === "US") {
+            const res = await api.get(`/api/usStock/${item.symbol}`);
             prices[item._id] =
               Math.round((res.data.price || 0) * USD_TO_KRW);
-          } else {
-            const res = await axios.get(
-              `http://localhost:5000/api/stock/korea/${item.symbol}`
-            );
+          } 
+          else {
+            const res = await api.get(`/api/stock/korea/${item.symbol}`);
             prices[item._id] = res.data.price || 0;
           }
-        } catch {
+        } catch (e) {
+          console.error("가격 로딩 실패:", item.symbol, e);
           prices[item._id] = item.buyPrice || 0;
         }
       }
@@ -144,7 +144,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchFx = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/fx");
+        const res = await api.get("/api/fx");
         setFx(res.data);
       } catch (e) {
         console.error("환율 로딩 실패", e);
@@ -232,12 +232,12 @@ export default function Dashboard() {
         <div className="asset-right">
           <TopList
             title="TOP GAINERS"
-            url="http://localhost:5000/api/market/korea/top-gainers"
+            url="/api/market/korea/top-gainers"
             type="up"
           />
           <TopList
             title="TOP LOSERS"
-            url="http://localhost:5000/api/market/korea/top-losers"
+            url="/api/market/korea/top-losers"
             type="down"
           />
         </div>
@@ -313,7 +313,10 @@ function TopList({ title, url, type }) {
   const [list, setList] = useState([]);
 
   useEffect(() => {
-    axios.get(url).then(res => setList(res.data));
+    api
+      .get(url)
+      .then(res => setList(res.data))
+      .catch(err => console.error(err));
   }, [url]);
 
   const getSymbol = (item) =>
@@ -342,6 +345,7 @@ function TopList({ title, url, type }) {
     </div>
   );
 }
+
 
 function FxCard({ title, value, diff }) {
   const isUp = diff >= 0;

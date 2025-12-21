@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { api } from "../services/api";
 import "../styles/Header.css";
 
 export default function Header({ setIsAuth, isAuth }) {
@@ -38,7 +38,7 @@ export default function Header({ setIsAuth, isAuth }) {
 
     const fetchSearch = async () => {
       try {
-        const res = await axios.get("/api/search", {
+        const res = await api.get("/api/search", {
           params: { query }
         });
         setSearchItems(res.data || []);
@@ -56,19 +56,28 @@ export default function Header({ setIsAuth, isAuth }) {
      가격 로드
   =============================== */
   useEffect(() => {
+    if (!searchItems.length) return;
+
     searchItems.slice(0, 10).forEach(async (item) => {
       if (prices[item.symbol]) return;
+
       try {
-        const res = await axios.get("/api/search/price", {
-          params: { type: item.type, symbol: item.symbol }
+        const res = await api.get("/api/search/price", {
+          params: {
+            type: item.type,
+            symbol: item.symbol
+          }
         });
+
         setPrices((prev) => ({
           ...prev,
           [item.symbol]: res.data
         }));
-      } catch {}
+      } catch (e) {
+        console.error("검색 가격 로딩 실패:", item.symbol, e);
+      }
     });
-  }, [searchItems]);
+  }, [searchItems, prices]);
 
   /* ===============================
      최근 검색 저장

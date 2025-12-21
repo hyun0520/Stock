@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "../services/api";
 import "../styles/Portfolio.css";
 import { fetchCryptoPrice } from "../services/crypto";
 
@@ -21,13 +21,13 @@ export default function Portfolio() {
   const [editId, setEditId] = useState(null);
   const [qty, setQty] = useState("");
   const [price, setPrice] = useState(""); // US는 달러 입력
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+
   // 현재가 저장 (id → price, 원화 기준)
   const [priceMap, setPriceMap] = useState({});
 
   const token = localStorage.getItem("token");
-   /* ===============================
+
+  /* ===============================
      종목 수만큼 자동으로 다른 색 생성
   =============================== */
   const generateColors = (count) => {
@@ -45,8 +45,8 @@ export default function Portfolio() {
   useEffect(() => {
     if (!token) return;
 
-    axios
-      .get("http://localhost:5000/api/portfolio", {
+    api
+      .get("/api/portfolio", {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then((res) => setList(res.data))
@@ -61,8 +61,6 @@ export default function Portfolio() {
   useEffect(() => {
     if (!list.length) return;
 
-    let timer;
-
     const fetchPrices = async () => {
       const prices = {};
 
@@ -73,17 +71,13 @@ export default function Portfolio() {
             prices[item._id] = data.price;
 
           } else if (item.market === "US") {
-            const res = await axios.get(
-              `http://localhost:5000/api/usStock/${item.symbol}`
-            );
+            const res = await api.get(`/api/usStock/${item.symbol}`);
             const usd = res.data.price || 0;
             prices[item._id] = Math.round(usd * USD_TO_KRW);
 
           } else {
-            const res = await axios.get(
-              `http://localhost:5000/api/stock/korea/${item.symbol}`
-            );
-            prices[item._id] = res.data.price;
+            const res = await api.get(`/api/stock/korea/${item.symbol}`);
+            prices[item._id] = res.data.price || 0;
           }
         } catch {
           prices[item._id] = priceMap[item._id] || 0;
@@ -94,8 +88,7 @@ export default function Portfolio() {
     };
 
     fetchPrices();
-    timer = setInterval(fetchPrices, 3000);
-
+    const timer = setInterval(fetchPrices, 3000);
     return () => clearInterval(timer);
   }, [list]);
 
@@ -105,7 +98,7 @@ export default function Portfolio() {
   const handleDelete = async (id) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
-    await axios.delete(`http://localhost:5000/api/portfolio/${id}`, {
+    await api.delete(`/api/portfolio/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
@@ -121,7 +114,7 @@ export default function Portfolio() {
     setQty(item.quantity);
 
     if (item.market === "US") {
-      setPrice((item.buyPrice / USD_TO_KRW).toFixed(2)); // $ 표시
+      setPrice((item.buyPrice / USD_TO_KRW).toFixed(2)); // $
     } else {
       setPrice(item.buyPrice);
     }
@@ -136,13 +129,12 @@ export default function Portfolio() {
     if (!item) return;
 
     let buyPriceKRW = Number(price);
-
     if (item.market === "US") {
       buyPriceKRW = Math.round(Number(price) * USD_TO_KRW);
     }
 
-    const res = await axios.put(
-      `http://localhost:5000/api/portfolio/${id}`,
+    const res = await api.put(
+      `/api/portfolio/${id}`,
       {
         quantity: Number(qty),
         buyPrice: buyPriceKRW
@@ -194,48 +186,36 @@ export default function Portfolio() {
     <div className="portfolio-wrap">
       <h1>MY PORTFOLIO</h1>
 
-      {/* 자산 */}
+      {/* ===== 요약 ===== */}
       <div className="portfolio-summary dashboard-style">
-      {/* 총 평가금액 */}
-      <div className="summary-item">
-        <span className="label">총 평가금액</span>
-        <span
-          className={`main-amount ${
-            isTotalPlus ? "profit-plus" : "profit-minus"
-          }`}
-        >
-          {Math.round(totalEval).toLocaleString()}원
-        </span>
+        <div className="summary-item">
+          <span className="label">총 평가금액</span>
+          <span className={`main-amount ${isTotalPlus ? "profit-plus" : "profit-minus"}`}>
+            {Math.round(totalEval).toLocaleString()}원
+          </span>
+        </div>
+
+        <div className="summary-item">
+          <span className="label">총 매수금액</span>
+          <span className="buy-amount-fixed">
+            {totalBuy.toLocaleString()}원
+          </span>
+        </div>
+
+        <div className="summary-item profit-box">
+          <span className="label">총 손익</span>
+          <span className={`profit-amount ${isTotalPlus ? "profit-plus" : "profit-minus"}`}>
+            {isTotalPlus ? "▲ " : "▼ "}
+            {Math.round(totalProfit).toLocaleString()}원 ({totalRate}%)
+          </span>
+        </div>
       </div>
 
-      {/* 총 매수금액 */}
-      <div className="summary-item">
-        <span className="label">총 매수금액</span>
-        <span className="buy-amount-fixed">
-          {totalBuy.toLocaleString()}원
-        </span>
-      </div>
-
-      {/* 총 손익 */}
-      <div className="summary-item profit-box">
-        <span className="label">총 손익</span>
-        <span
-          className={`profit-amount ${
-            isTotalPlus ? "profit-plus" : "profit-minus"
-          }`}
-        >
-          {isTotalPlus ? "▲ " : "▼ "}
-          {Math.round(totalProfit).toLocaleString()}원 ({totalRate}%)
-        </span>
-      </div>
-    </div>
-
-      {/* 차트 */}
+      {/* ===== 차트 ===== */}
       <div className="portfolio-chart-wrap">
         <h3>보유자산</h3>
 
         <div className="portfolio-chart-row">
-          {/* 왼쪽: 도넛 차트 */}
           <div className="chart-box">
             <ResponsiveContainer width={290} height={290}>
               <PieChart>
@@ -249,17 +229,14 @@ export default function Portfolio() {
                   isAnimationActive={false}
                 >
                   {pieData.map((_, i) => (
-                    <Cell
-                      key={i}
-                      fill={COLORS[i % COLORS.length]}
-                    />
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
+                <Tooltip />
               </PieChart>
             </ResponsiveContainer>
           </div>
 
-          {/* 오른쪽: 비율 리스트 */}
           <div className="chart-legend">
             {pieData.map((item, i) => {
               const percent =
@@ -282,7 +259,7 @@ export default function Portfolio() {
         </div>
       </div>
 
-      {/* 목록 */}
+      {/* ===== 목록 ===== */}
       {list.map((item) => {
         const current = priceMap[item._id] || 0;
         const buyTotal = item.buyPrice * item.quantity;
@@ -325,16 +302,13 @@ export default function Portfolio() {
                 <button className="cancel-btn" onClick={() => setEditId(null)}>
                   취소
                 </button>
-              </div>  
+              </div>
             ) : (
               <div className="right">
                 <span>보유: {item.quantity}</span>
                 <span>매수가: {item.buyPrice.toLocaleString()}원</span>
                 <span>
-                  현재가:{" "}
-                  <strong>
-                    {current.toLocaleString()}원
-                  </strong>
+                  현재가: <strong>{current.toLocaleString()}원</strong>
                 </span>
                 <span>평가금액: {evalTotal.toLocaleString()}원</span>
                 <span className={isPlus ? "profit plus" : "profit minus"}>

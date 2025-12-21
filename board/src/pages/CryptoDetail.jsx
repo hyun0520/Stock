@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import { api } from "../services/api";
 import AssetActions from "../components/AssetActions";
 
 export default function CryptoDetail() {
@@ -20,9 +20,7 @@ export default function CryptoDetail() {
 
     async function fetchDetail() {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/crypto/detail/${market}`
-        );
+        const res = await api.get(`/api/crypto/detail/${market}`);
         if (!mounted) return;
         setDetail(res.data);
         setError("");
@@ -41,7 +39,7 @@ export default function CryptoDetail() {
   }, [market]);
 
   /* ===============================
-     ✅ 이미 관심종목인지 체크 (US와 동일)
+     ✅ 이미 관심종목인지 체크
   =============================== */
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -49,7 +47,7 @@ export default function CryptoDetail() {
 
     async function checkWatchlist() {
       try {
-        const res = await axios.get("http://localhost:5000/api/watchlist", {
+        const res = await api.get("/api/watchlist", {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -74,12 +72,11 @@ export default function CryptoDetail() {
   const fetchChartByRange = useCallback(
     async (range) => {
       try {
-        const res = await axios.get(
-          `http://localhost:5000/api/crypto/candles/${market}`,
+        const res = await api.get(
+          `/api/crypto/candles/${market}`,
           { params: { range } }
         );
 
-        // recharts: time은 number(timestamp)로 맞춤
         return Array.isArray(res.data)
           ? res.data.map((c) => ({
               time: new Date(c.candle_date_time_kst).getTime(),
@@ -95,7 +92,7 @@ export default function CryptoDetail() {
   );
 
   /* ===============================
-     ⭐ 관심종목 추가 (버튼 회색 고정)
+     ⭐ 관심종목 추가
   =============================== */
   const addToWatchlist = useCallback(async () => {
     try {
@@ -110,10 +107,10 @@ export default function CryptoDetail() {
         return;
       }
 
-      await axios.post(
-        "http://localhost:5000/api/watchlist",
+      await api.post(
+        "/api/watchlist",
         {
-          symbol: detail.symbol || market, // KRW-XRP
+          symbol: detail.symbol || market,
           name:
             detail.nameKr
               ? `${detail.nameKr} (${detail.code || market.replace("KRW-", "")})`
@@ -134,14 +131,11 @@ export default function CryptoDetail() {
   }, [detail, market]);
 
   /* ===============================
-     📌 포트폴리오 추가 (AssetActions 규격)
-     - 성공: true
-     - 실패: 에러문자열
+     📌 포트폴리오 추가
   =============================== */
   const addToPortfolio = async (qty, buy) => {
     const token = localStorage.getItem("token");
     if (!token) return "로그인이 필요합니다.";
-
     if (!detail) return "코인 정보가 없습니다.";
 
     if (!qty || !buy || Number(qty) <= 0 || Number(buy) <= 0) {
@@ -149,26 +143,24 @@ export default function CryptoDetail() {
     }
 
     try {
-      await axios.post(
-        "http://localhost:5000/api/portfolio",
+      await api.post(
+        "/api/portfolio",
         {
-          symbol: detail.symbol || market,     // KRW-XRP
+          symbol: detail.symbol || market,
           name:
             detail.nameKr
-              ? `${detail.nameKr}`
+              ? detail.nameKr
               : detail.name || market.replace("KRW-", ""),
           market: "CRYPTO",
           quantity: Number(qty),
-          buyPrice: Number(buy)                 // ⭐ 반드시 Number
+          buyPrice: Number(buy)
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`    // ⭐ 핵심
-          }
+          headers: { Authorization: `Bearer ${token}` }
         }
       );
 
-      return true; // ⭐ AssetActions에서 성공 처리
+      return true;
     } catch (err) {
       console.error("❌ portfolio add error", err);
       return (
@@ -184,17 +176,13 @@ export default function CryptoDetail() {
   if (loading) return <div style={{ padding: 40 }}>로딩 중...</div>;
   if (!detail) return <div style={{ padding: 40 }}>데이터 없음</div>;
 
-  // 상단 타이틀: "엑스알피(리플) (XRP)" 형태로 보여주기
-  const code = detail.code || market.replace("KRW-", "");
   const title =
-    detail.nameKrFull
-      ? detail.nameKrFull
-      : detail.nameKr
-      ? detail.nameKr
-      : market.replace("KRW-", "");
+    detail.nameKrFull ||
+    detail.nameKr ||
+    market.replace("KRW-", "");
 
-  const isUp = typeof detail.change === "number" && detail.change > 0;
-  const isDown = typeof detail.change === "number" && detail.change < 0;
+  const isUp = detail.change > 0;
+  const isDown = detail.change < 0;
 
   return (
     <div style={{ padding: "40px", maxWidth: 1100, margin: "0 auto" }}>
@@ -203,7 +191,6 @@ export default function CryptoDetail() {
         가상자산 · 최근 조회 기준
       </p>
 
-      {/* 상단 현재가/등락 (US 주식 스타일) */}
       <div style={{ margin: "14px 0 18px", fontSize: 22 }}>
         현재가: <strong>{Number(detail.price).toLocaleString()} 원</strong>
 
@@ -216,8 +203,8 @@ export default function CryptoDetail() {
           {isUp && "▲ "}
           {isDown && "▼ "}
           {detail.change >= 0 ? "+" : ""}
-          {Math.abs(detail.change).toLocaleString()}{" "}
-          ({detail.rate >= 0 ? "+" : ""}
+          {Math.abs(detail.change).toLocaleString()} (
+          {detail.rate >= 0 ? "+" : ""}
           {Number(detail.rate).toFixed(2)}%)
         </span>
       </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import { api } from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
 
 export default function Register({ setIsAuth }) {
@@ -20,7 +20,7 @@ export default function Register({ setIsAuth }) {
   const navigate = useNavigate();
 
   /* ===============================
-     🔥 회원가입 페이지에서만 footer 숨김
+     회원가입 페이지에서만 footer 숨김
   =============================== */
   useEffect(() => {
     document.body.classList.add("hide-footer");
@@ -36,7 +36,7 @@ export default function Register({ setIsAuth }) {
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
   /* ===============================
-     🔍 아이디 입력 시 실시간 중복 체크
+     아이디 입력 시 실시간 중복 체크
   =============================== */
   const handleUsernameChange = async (e) => {
     const value = e.target.value;
@@ -50,8 +50,9 @@ export default function Register({ setIsAuth }) {
     }
 
     try {
-      const res = await axios.get(
-        `/api/auth/check-username?username=${value}`
+      const res = await api.get(
+        `/api/auth/check-username`,
+        { params: { username: value } }
       );
 
       if (res.data.available) {
@@ -61,7 +62,8 @@ export default function Register({ setIsAuth }) {
         setUsernameAvailable(false);
         setUsernameMsg("이미 사용 중인 아이디입니다");
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       setUsernameMsg("아이디 확인 중 오류 발생");
     }
   };
@@ -94,25 +96,34 @@ export default function Register({ setIsAuth }) {
     setMsg("");
 
     try {
-      await axios.post("/api/auth/register", {
+      /* 회원가입 */
+      await api.post("/api/auth/register", {
         username,
         email,
         password,
-        birthDate: `${year}-${month}-${day}`,
+        birthDate: `${year}-${month}-${day}`
       });
 
-      const res = await axios.post("/api/auth/login", {
+      /* 자동 로그인 */
+      const res = await api.post("/api/auth/login", {
         email,
-        password,
+        password
       });
 
       localStorage.setItem("token", res.data.token);
-      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem(
+        "user",
+        JSON.stringify(res.data.user)
+      );
 
       setIsAuth(true);
       navigate("/dashboard");
     } catch (err) {
-      setMsg(err.response?.data?.message || "회원가입 실패");
+      console.error(err);
+      setMsg(
+        err.response?.data?.message ||
+        "회원가입 실패"
+      );
     } finally {
       setLoading(false);
     }
@@ -120,12 +131,18 @@ export default function Register({ setIsAuth }) {
 
   return (
     <div className="register-page">
-      <button className="register-close" onClick={() => navigate(-1)}>
+      <button
+        className="register-close"
+        onClick={() => navigate(-1)}
+      >
         ✕
       </button>
 
-      <div className="register-logo" onClick={() => navigate("/")}>
-        <img src="/logo22.png" alt="Stock Events Logo" />
+      <div
+        className="register-logo"
+        onClick={() => navigate("/")}
+      >
+        <img src="/logo22.png" alt="Logo" />
       </div>
 
       <div className="register-card">
@@ -138,7 +155,13 @@ export default function Register({ setIsAuth }) {
           placeholder="닉네임"
         />
         {usernameMsg && (
-          <p className={usernameAvailable ? "msg-success" : "msg-error"}>
+          <p
+            className={
+              usernameAvailable
+                ? "msg-success"
+                : "msg-error"
+            }
+          >
             {usernameMsg}
           </p>
         )}
@@ -147,22 +170,32 @@ export default function Register({ setIsAuth }) {
         <input
           type="email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) =>
+            setEmail(e.target.value)
+          }
         />
 
         <label>비밀번호</label>
         <input
           type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e) =>
+            setPassword(e.target.value)
+          }
         />
 
         <label>생년월일</label>
         <div className="birth-select">
-          <select value={year} onChange={(e) => setYear(e.target.value)}>
+          <select
+            value={year}
+            onChange={(e) =>
+              setYear(e.target.value)
+            }
+          >
             <option value="">년</option>
             {Array.from({ length: 100 }, (_, i) => {
-              const y = new Date().getFullYear() - i;
+              const y =
+                new Date().getFullYear() - i;
               return (
                 <option key={y} value={y}>
                   {y}
@@ -171,24 +204,40 @@ export default function Register({ setIsAuth }) {
             })}
           </select>
 
-          <select value={month} onChange={(e) => setMonth(e.target.value)}>
+          <select
+            value={month}
+            onChange={(e) =>
+              setMonth(e.target.value)
+            }
+          >
             <option value="">월</option>
             {Array.from({ length: 12 }, (_, i) => (
               <option
                 key={i + 1}
-                value={String(i + 1).padStart(2, "0")}
+                value={String(i + 1).padStart(
+                  2,
+                  "0"
+                )}
               >
                 {i + 1}
               </option>
             ))}
           </select>
 
-          <select value={day} onChange={(e) => setDay(e.target.value)}>
+          <select
+            value={day}
+            onChange={(e) =>
+              setDay(e.target.value)
+            }
+          >
             <option value="">일</option>
             {Array.from({ length: 31 }, (_, i) => (
               <option
                 key={i + 1}
-                value={String(i + 1).padStart(2, "0")}
+                value={String(i + 1).padStart(
+                  2,
+                  "0"
+                )}
               >
                 {i + 1}
               </option>
@@ -204,10 +253,13 @@ export default function Register({ setIsAuth }) {
           {loading ? "처리 중..." : "계정 만들기"}
         </button>
 
-        {msg && <p className="register-msg">{msg}</p>}
+        {msg && (
+          <p className="register-msg">{msg}</p>
+        )}
 
         <p className="register-footer">
-          이미 계정이 있나요? <Link to="/login">로그인</Link>
+          이미 계정이 있나요?{" "}
+          <Link to="/login">로그인</Link>
         </p>
       </div>
     </div>

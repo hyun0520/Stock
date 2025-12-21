@@ -1,4 +1,4 @@
-import axios from "axios";
+import { api } from "../services/api";
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import AssetActions from "../components/AssetActions";
@@ -16,34 +16,34 @@ export default function StockDetailUS() {
   const [usdRate, setUsdRate] = useState(1350);
 
   /* ===============================
-     환율 가져오기 (10분 캐시)
+     💱 환율 로드 (공통 API)
   =============================== */
   useEffect(() => {
-    const fetchRate = async () => {
+    const fetchFx = async () => {
       try {
-        const res = await axios.get(
-          "https://api.exchangerate.host/latest?base=USD&symbols=KRW"
-        );
-        setUsdRate(res.data.rates.KRW);
-      } catch {
-        // 실패 시 기존 값 유지
+        const res = await api.get("/api/fx");
+        if (res.data?.USD?.rate) {
+          setUsdRate(res.data.USD.rate);
+        }
+      } catch (e) {
+        console.error("환율 로딩 실패", e);
       }
     };
 
-    fetchRate();
-    const timer = setInterval(fetchRate, 10 * 60 * 1000);
+    fetchFx();
+    const timer = setInterval(fetchFx, 10 * 60 * 1000);
     return () => clearInterval(timer);
   }, []);
 
   /* ===============================
-     🇺🇸 상세 정보 로드 (차트 ❌)
+     🇺🇸 상세 정보 로드
   =============================== */
   useEffect(() => {
     let mounted = true;
 
     async function fetchDetail() {
       try {
-        const res = await axios.get(`/api/usStock/${symbol}`);
+        const res = await api.get(`/api/usStock/${symbol}`);
         if (!mounted) return;
         setDetail(res.data || null);
       } catch (err) {
@@ -69,7 +69,7 @@ export default function StockDetailUS() {
 
     async function checkWatchlist() {
       try {
-        const res = await axios.get("/api/watchlist", {
+        const res = await api.get("/api/watchlist", {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -87,22 +87,23 @@ export default function StockDetailUS() {
   }, [symbol]);
 
   /* ===============================
-    📈 차트 fetch (AssetActions용)
+     📈 차트 fetch (AssetActions)
   =============================== */
-  const fetchChartByRange = async (range) => {
-    try {
-      const res = await axios.get(
-        `/api/usStock/${symbol}/chart`,
-        { params: { range } }
-      );
-
-      return Array.isArray(res.data) ? res.data : [];
-    } catch (e) {
-      console.error("❌ US chart fetch failed", e);
-      return [];
-    }
-  };
-
+  const fetchChartByRange = useCallback(
+    async (range) => {
+      try {
+        const res = await api.get(
+          `/api/usStock/${symbol}/chart`,
+          { params: { range } }
+        );
+        return Array.isArray(res.data) ? res.data : [];
+      } catch (e) {
+        console.error("❌ US chart fetch failed", e);
+        return [];
+      }
+    },
+    [symbol]
+  );
 
   /* ===============================
      계산값
@@ -136,7 +137,7 @@ export default function StockDetailUS() {
         return;
       }
 
-      await axios.post(
+      await api.post(
         "/api/watchlist",
         {
           symbol: detail.symbol,
@@ -169,7 +170,7 @@ export default function StockDetailUS() {
     try {
       const buyPriceKRW = Math.round(Number(buy) * usdRate);
 
-      await axios.post(
+      await api.post(
         "/api/portfolio",
         {
           symbol: detail.symbol,
@@ -186,7 +187,7 @@ export default function StockDetailUS() {
       return true;
     } catch (err) {
       return (
-        err.response?.data?.msg ||
+        err.response?.data?.message ||
         "이미 등록되었거나 오류가 발생했습니다."
       );
     }
@@ -225,7 +226,6 @@ export default function StockDetailUS() {
         </span>
       </div>
 
-      {/*  공통 차트 + 액션 */}
       <AssetActions
         fetchChart={fetchChartByRange}
         chartColor="#ff8a00"

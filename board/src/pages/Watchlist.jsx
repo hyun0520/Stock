@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "../services/api";
 import { useNavigate } from "react-router-dom";
 import "../styles/Watchlist.css";
 
-
 const USD_TO_KRW = 1474;
+
 export default function Watchlist() {
   const [list, setList] = useState([]);
   const [prices, setPrices] = useState({});
   const [rateMap, setRateMap] = useState({});
   const [prevPrices, setPrevPrices] = useState({});
   const [loading, setLoading] = useState(true);
+
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
@@ -18,10 +19,9 @@ export default function Watchlist() {
      관심종목 불러오기
   =============================== */
   const fetchWatchlist = async () => {
-    const res = await axios.get(
-      "http://localhost:5000/api/watchlist",
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    const res = await api.get("/api/watchlist", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
     setList(res.data);
     return res.data;
   };
@@ -37,38 +37,31 @@ export default function Watchlist() {
     await Promise.all(
       items.map(async (item) => {
         try {
-          /* ================= CRYPTO ================= */
+          /* ===== CRYPTO ===== */
           if (item.market === "CRYPTO") {
-            const res = await axios.get(
-              "http://localhost:5000/api/search/price",
-              {
-                params: {
-                  type: "CRYPTO",
-                  symbol: item.symbol
-                }
+            const res = await api.get("/api/search/price", {
+              params: {
+                type: "CRYPTO",
+                symbol: item.symbol
               }
-            );
+            });
 
             priceTemp[item.symbol] = res.data.price;
             rateTemp[item.symbol] = res.data.changeRate ?? null;
           }
 
-          /* ================= US ================= */
+          /* ===== US ===== */
           else if (item.market === "US") {
-            const res = await axios.get(
-              `http://localhost:5000/api/usStock/${item.symbol}`
-            );
+            const res = await api.get(`/api/usStock/${item.symbol}`);
 
             const krw = Math.round(res.data.price * USD_TO_KRW);
             priceTemp[item.symbol] = krw;
             rateTemp[item.symbol] = res.data.rate;
           }
 
-          /* ================= KOREA ================= */
+          /* ===== KOREA ===== */
           else {
-            const res = await axios.get(
-              `http://localhost:5000/api/stock/korea/${item.symbol}`
-            );
+            const res = await api.get(`/api/stock/korea/${item.symbol}`);
 
             priceTemp[item.symbol] = res.data.price;
             rateTemp[item.symbol] = res.data.rate ?? null;
@@ -86,8 +79,8 @@ export default function Watchlist() {
   };
 
   /* ===============================
-     초기 + 실시간 폴링
-     (CRYPTO / KOREA만 3초)
+     초기 로드 + 실시간 폴링
+     (CRYPTO / KOREA / US 동일)
   =============================== */
   useEffect(() => {
     let timer;
@@ -102,18 +95,18 @@ export default function Watchlist() {
       }, 3000);
     }
 
-    init();
+    if (token) init();
     return () => clearInterval(timer);
-  }, []);
+  }, [token]);
 
   /* ===============================
      삭제
   =============================== */
   const removeItem = async (id) => {
-    await axios.delete(
-      `http://localhost:5000/api/watchlist/${id}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    await api.delete(`/api/watchlist/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
     setList((prev) => prev.filter((i) => i._id !== id));
   };
 
@@ -143,7 +136,8 @@ export default function Watchlist() {
 
         const isUp = diff > 0;
         const isDown = diff < 0;
-        const changeClass = isUp ? "price-rise" : isDown ? "price-fall" : "";
+        const changeClass =
+          isUp ? "price-rise" : isDown ? "price-fall" : "";
 
         return (
           <div
