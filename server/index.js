@@ -1,7 +1,10 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+dotenv.config({ path: "../.env" });
 import mongoose from "mongoose";
+
+// Routes
 import stockRoutes from "./routes/stock.js";
 import watchlistRoutes from "./routes/watchlist.js";
 import portfolioRoutes from "./routes/portfolio.js";
@@ -10,23 +13,33 @@ import searchRoutes from "./routes/search.js";
 import usStockRoutes from "./routes/usStock.js";
 import marketRouter from "./routes/market.js";
 import fxRoutes from "./routes/fx.js";
-
-// Routes
 import userRoutes from "./routes/user.js";
 
 dotenv.config();
 
-mongoose
-  .connect('mongodb+srv://ven160004_db_user:Hexlbh34!@cluster0.pvqlkqm.mongodb.net/')
-  .then(() => console.log("🔥 MongoDB Connected"))
-  .catch((err) => console.error("DB Error:", err));
-
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+console.log("ENV CHECK:", process.env.MONGO_URI);
+/* ===============================
+   🔥 MongoDB
+=============================== */
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("🔥 MongoDB Connected"))
+  .catch((err) => {
+    console.error("❌ DB Error:", err);
+    process.exit(1);
+  });
 
+/* ===============================
+   🔥 Middleware
+=============================== */
 app.use(cors());
 app.use(express.json());
 
+/* ===============================
+   🔥 Routes
+=============================== */
 app.use("/api/auth", userRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/stock", stockRoutes);
@@ -42,7 +55,6 @@ app.get("/", (req, res) => {
   res.send("Server Running");
 });
 
-// const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
