@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 // ===============================
 // 🔥 ENV
 // ===============================
-dotenv.config(); // ✅ Render에서는 이것만 사용
+dotenv.config();
 
 // ===============================
 // 🔥 Routes
@@ -41,20 +41,34 @@ mongoose
   });
 
 // ===============================
-// 🔥 Middleware
+// 🔥 CORS (🔥 핵심 수정 부분)
 // ===============================
-// ✅ Netlify + Local 둘 다 허용 (문제 생기면 origin 제한 가능)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://checkmyasset.netlify.app"
+];
+
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://checkmyasset.netlify.app"
-    ],
+    origin: (origin, callback) => {
+      // Postman / 서버 내부 요청 허용
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("CORS not allowed"), false);
+      }
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
   })
 );
+
+// 🔥 프리플라이트 요청 무조건 통과
+app.options("*", cors());
+
 app.use(express.json());
 
 // ===============================
@@ -76,6 +90,14 @@ app.use("/api/fx", fxRoutes);
 // ===============================
 app.get("/", (req, res) => {
   res.send("Server Running");
+});
+
+// ===============================
+// 🔥 Global Error Handler (🔥 중요)
+// ===============================
+app.use((err, req, res, next) => {
+  console.error("🔥 Global Error:", err.message);
+  res.status(500).json({ message: "Server error", error: err.message });
 });
 
 // ===============================
