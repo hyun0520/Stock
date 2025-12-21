@@ -4,9 +4,9 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 
 // ===============================
-// 🔥 ENV
+// 🔥 ENV (Render 전용)
 // ===============================
-dotenv.config();
+dotenv.config(); // ✅ 이것만 사용
 
 // ===============================
 // 🔥 Routes
@@ -37,37 +37,15 @@ mongoose
   .then(() => console.log("🔥 MongoDB Connected"))
   .catch((err) => {
     console.error("❌ MongoDB Error:", err);
-    process.exit(1);
+    process.exit(1); // ❗ 연결 실패하면 서버 종료
   });
 
 // ===============================
-// 🔥 CORS (🔥 핵심 수정 부분)
+// 🔥 Middleware
 // ===============================
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://checkmyasset.netlify.app"
-];
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Postman / 서버 내부 요청 허용
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      } else {
-        return callback(new Error("CORS not allowed"), false);
-      }
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-
-// 🔥 프리플라이트 요청 무조건 통과
-app.options("*", cors());
+// ✅ 일단 CORS 전체 허용 (문제 해결 후 제한)
+app.use(cors());
 
 app.use(express.json());
 
@@ -86,18 +64,10 @@ app.use("/api/market", marketRouter);
 app.use("/api/fx", fxRoutes);
 
 // ===============================
-// 🔥 Health Check
+// 🔥 Health Check (중요)
 // ===============================
 app.get("/", (req, res) => {
-  res.send("Server Running");
-});
-
-// ===============================
-// 🔥 Global Error Handler (🔥 중요)
-// ===============================
-app.use((err, req, res, next) => {
-  console.error("🔥 Global Error:", err.message);
-  res.status(500).json({ message: "Server error", error: err.message });
+  res.send("✅ Server Running");
 });
 
 // ===============================
