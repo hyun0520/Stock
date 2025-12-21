@@ -44,7 +44,17 @@ mongoose
 // 🔥 Middleware
 // ===============================
 // ✅ Netlify + Local 둘 다 허용 (문제 생기면 origin 제한 가능)
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://checkmyasset.netlify.app"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true
+  })
+);
 app.use(express.json());
 
 // ===============================
