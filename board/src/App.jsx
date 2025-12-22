@@ -20,6 +20,16 @@ function App() {
   );
 
   const location = useLocation();
+  useEffect(() => {
+  // Render 서버 깨우기
+    fetch(import.meta.env.VITE_API_URL)
+      .then(() => {
+        console.log("Server wake-up ping sent");
+      })
+      .catch(() => {
+        console.log("Server wake-up failed (sleeping)");
+      });
+  }, []);
 
   // 회원가입 페이지만 Header 숨김
   const hideHeader = location.pathname === "/register";
