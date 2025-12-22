@@ -19,7 +19,7 @@ export default function Watchlist() {
      관심종목 불러오기
   =============================== */
   const fetchWatchlist = async () => {
-    const res = await api.get("/api/watchlist", {
+    const res = await api.get("/watchlist", {
       headers: { Authorization: `Bearer ${token}` }
     });
     setList(res.data);
@@ -39,7 +39,7 @@ export default function Watchlist() {
         try {
           /* ===== CRYPTO ===== */
           if (item.market === "CRYPTO") {
-            const res = await api.get("/api/search/price", {
+            const res = await api.get("/search/price", {
               params: {
                 type: "CRYPTO",
                 symbol: item.symbol
@@ -52,7 +52,7 @@ export default function Watchlist() {
 
           /* ===== US ===== */
           else if (item.market === "US") {
-            const res = await api.get(`/api/usStock/${item.symbol}`);
+            const res = await api.get(`/usStock/${item.symbol}`);
 
             const krw = Math.round(res.data.price * USD_TO_KRW);
             priceTemp[item.symbol] = krw;
@@ -61,7 +61,7 @@ export default function Watchlist() {
 
           /* ===== KOREA ===== */
           else {
-            const res = await api.get(`/api/stock/korea/${item.symbol}`);
+            const res = await api.get(`/stock/korea/${item.symbol}`);
 
             priceTemp[item.symbol] = res.data.price;
             rateTemp[item.symbol] = res.data.rate ?? null;
@@ -103,7 +103,7 @@ export default function Watchlist() {
      삭제
   =============================== */
   const removeItem = async (id) => {
-    await api.delete(`/api/watchlist/${id}`, {
+    await api.delete(`/watchlist/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 

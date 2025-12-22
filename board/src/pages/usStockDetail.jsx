@@ -21,7 +21,7 @@ export default function StockDetailUS() {
   useEffect(() => {
     const fetchFx = async () => {
       try {
-        const res = await api.get("/api/fx");
+        const res = await api.get("/fx");
         if (res.data?.USD?.rate) {
           setUsdRate(res.data.USD.rate);
         }
@@ -43,7 +43,7 @@ export default function StockDetailUS() {
 
     async function fetchDetail() {
       try {
-        const res = await api.get(`/api/usStock/${symbol}`);
+        const res = await api.get(`/usStock/${symbol}`);
         if (!mounted) return;
         setDetail(res.data || null);
       } catch (err) {
@@ -69,7 +69,7 @@ export default function StockDetailUS() {
 
     async function checkWatchlist() {
       try {
-        const res = await api.get("/api/watchlist", {
+        const res = await api.get("/watchlist", {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -93,7 +93,7 @@ export default function StockDetailUS() {
     async (range) => {
       try {
         const res = await api.get(
-          `/api/usStock/${symbol}/chart`,
+          `/usStock/${symbol}/chart`,
           { params: { range } }
         );
         return Array.isArray(res.data) ? res.data : [];
@@ -138,7 +138,7 @@ export default function StockDetailUS() {
       }
 
       await api.post(
-        "/api/watchlist",
+        "/watchlist",
         {
           symbol: detail.symbol,
           name: detail.name || detail.symbol,
@@ -171,7 +171,7 @@ export default function StockDetailUS() {
       const buyPriceKRW = Math.round(Number(buy) * usdRate);
 
       await api.post(
-        "/api/portfolio",
+        "/portfolio",
         {
           symbol: detail.symbol,
           name: detail.name || detail.symbol,

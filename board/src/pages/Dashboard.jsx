@@ -53,19 +53,19 @@ export default function Dashboard() {
 
   /* ================= INDEX ================= */
   useEffect(() => {
-    api.get("/api/market/index/kospi")
+    api.get("/market/index/kospi")
       .then(res => setKospi(res.data))
       .catch(() => setKospi(marketData));
 
-    api.get("/api/market/index/kosdaq")
+    api.get("/market/index/kosdaq")
       .then(res => setKosdaq(res.data))
       .catch(() => setKosdaq(marketData));
 
-    api.get("/api/market/index/nasdaq")
+    api.get("/market/index/nasdaq")
       .then(res => setNasdaq(res.data))
       .catch(() => setNasdaq(marketData));
 
-    api.get("/api/market/index/sp500")
+    api.get("/market/index/sp500")
       .then(res => setSp500(res.data))
       .catch(() => setSp500(marketData));
   }, []);
@@ -75,7 +75,7 @@ export default function Dashboard() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    api.get("/api/portfolio", {
+    api.get("/portfolio", {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => setPortfolio(res.data));
   }, []);
@@ -97,12 +97,12 @@ export default function Dashboard() {
             prices[item._id] = data.price;
           } 
           else if (market === "US") {
-            const res = await api.get(`/api/usStock/${item.symbol}`);
+            const res = await api.get(`/usStock/${item.symbol}`);
             prices[item._id] =
               Math.round((res.data.price || 0) * USD_TO_KRW);
           } 
           else {
-            const res = await api.get(`/api/stock/korea/${item.symbol}`);
+            const res = await api.get(`/stock/korea/${item.symbol}`);
             prices[item._id] = res.data.price || 0;
           }
         } catch (e) {
@@ -144,7 +144,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchFx = async () => {
       try {
-        const res = await api.get("/api/fx");
+        const res = await api.get("/fx");
         setFx(res.data);
       } catch (e) {
         console.error("환율 로딩 실패", e);
@@ -232,12 +232,12 @@ export default function Dashboard() {
         <div className="asset-right">
           <TopList
             title="TOP GAINERS"
-            url="/api/market/korea/top-gainers"
+            url="/market/korea/top-gainers"
             type="up"
           />
           <TopList
             title="TOP LOSERS"
-            url="/api/market/korea/top-losers"
+            url="/market/korea/top-losers"
             type="down"
           />
         </div>

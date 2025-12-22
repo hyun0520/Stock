@@ -20,7 +20,7 @@ export default function CryptoDetail() {
 
     async function fetchDetail() {
       try {
-        const res = await api.get(`/api/crypto/detail/${market}`);
+        const res = await api.get(`/crypto/detail/${market}`);
         if (!mounted) return;
         setDetail(res.data);
         setError("");
@@ -47,7 +47,7 @@ export default function CryptoDetail() {
 
     async function checkWatchlist() {
       try {
-        const res = await api.get("/api/watchlist", {
+        const res = await api.get("/watchlist", {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -73,7 +73,7 @@ export default function CryptoDetail() {
     async (range) => {
       try {
         const res = await api.get(
-          `/api/crypto/candles/${market}`,
+          `/crypto/candles/${market}`,
           { params: { range } }
         );
 
@@ -108,7 +108,7 @@ export default function CryptoDetail() {
       }
 
       await api.post(
-        "/api/watchlist",
+        "/watchlist",
         {
           symbol: detail.symbol || market,
           name:
@@ -144,7 +144,7 @@ export default function CryptoDetail() {
 
     try {
       await api.post(
-        "/api/portfolio",
+        "/portfolio",
         {
           symbol: detail.symbol || market,
           name:

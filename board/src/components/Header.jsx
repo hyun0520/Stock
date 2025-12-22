@@ -38,7 +38,7 @@ export default function Header({ setIsAuth, isAuth }) {
 
     const fetchSearch = async () => {
       try {
-        const res = await api.get("/api/search", {
+        const res = await api.get("/search", {
           params: { query }
         });
         setSearchItems(res.data || []);
@@ -62,7 +62,7 @@ export default function Header({ setIsAuth, isAuth }) {
       if (prices[item.symbol]) return;
 
       try {
-        const res = await api.get("/api/search/price", {
+        const res = await api.get("/search/price", {
           params: {
             type: item.type,
             symbol: item.symbol

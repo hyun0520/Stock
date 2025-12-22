@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { api } from "../services/api";
 import "../styles/Portfolio.css";
 import { fetchCryptoPrice } from "../services/crypto";
-
 import {
   PieChart,
   Pie,
@@ -46,7 +45,7 @@ export default function Portfolio() {
     if (!token) return;
 
     api
-      .get("/api/portfolio", {
+      .get("/portfolio", {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then((res) => setList(res.data))
@@ -71,12 +70,12 @@ export default function Portfolio() {
             prices[item._id] = data.price;
 
           } else if (item.market === "US") {
-            const res = await api.get(`/api/usStock/${item.symbol}`);
+            const res = await api.get(`/usStock/${item.symbol}`);
             const usd = res.data.price || 0;
             prices[item._id] = Math.round(usd * USD_TO_KRW);
 
           } else {
-            const res = await api.get(`/api/stock/korea/${item.symbol}`);
+            const res = await api.get(`/stock/korea/${item.symbol}`);
             prices[item._id] = res.data.price || 0;
           }
         } catch {
@@ -98,7 +97,7 @@ export default function Portfolio() {
   const handleDelete = async (id) => {
     if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
-    await api.delete(`/api/portfolio/${id}`, {
+    await api.delete(`/portfolio/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 
@@ -134,7 +133,7 @@ export default function Portfolio() {
     }
 
     const res = await api.put(
-      `/api/portfolio/${id}`,
+      `/portfolio/${id}`,
       {
         quantity: Number(qty),
         buyPrice: buyPriceKRW

@@ -6,5 +6,17 @@ const API_BASE = import.meta.env.PROD
 
 export const api = axios.create({
   baseURL: API_BASE,
-  withCredentials: false, // JWT header 방식이면 false
+  withCredentials: false,
 });
+
+// 🔐 JWT 자동 첨부
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);

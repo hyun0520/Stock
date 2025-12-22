@@ -22,7 +22,7 @@ export default function StockDetail() {
 
     async function fetchDetail() {
       try {
-        const res = await api.get(`/api/stock/korea/${symbol}`);
+        const res = await api.get(`/stock/korea/${symbol}`);
         const data = Array.isArray(res.data)
           ? res.data[0]
           : res.data;
@@ -51,7 +51,7 @@ export default function StockDetail() {
 
     async function checkWatchlist() {
       try {
-        const res = await api.get("/api/watchlist", {
+        const res = await api.get("/watchlist", {
           headers: { Authorization: `Bearer ${token}` }
         });
 
@@ -75,7 +75,7 @@ export default function StockDetail() {
     async (range) => {
       try {
         const res = await api.get(
-          `/api/stock/korea/${symbol}/chart`,
+          `/stock/korea/${symbol}/chart`,
           { params: { range } }
         );
 
@@ -100,7 +100,7 @@ export default function StockDetail() {
       }
 
       await api.post(
-        "/api/watchlist",
+        "/watchlist",
         {
           symbol: detail.symbol,
           name: detail.name,
@@ -131,7 +131,7 @@ export default function StockDetail() {
 
     try {
       await api.post(
-        "/api/portfolio",
+        "/portfolio",
         {
           symbol: detail.symbol,
           name: detail.name,
