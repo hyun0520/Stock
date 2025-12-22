@@ -269,7 +269,20 @@ body.hide-footer footer {
   cursor: pointer;
 }
 
+/* ===== Register Logo ===== */
+.register-logo {
+  margin-top: 40px;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
 
+.register-logo img {
+  width: 280px;        
+  max-width: 70vw;     
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
 
 .register-card {
   width: 100%;
@@ -380,7 +393,7 @@ body.hide-footer footer {
   }
 
   .register-logo img {
-    height: 95px;   /* 🔥 모바일에서 너무 크지 않게 */
+    height: 95px; 
     width: auto;
   }
 
