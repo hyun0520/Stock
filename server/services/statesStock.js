@@ -58,7 +58,7 @@ export async function getStockDetail(symbol) {
 }
 
 /* ===============================
-   ✅ range -> (period1, period2, interval)
+   range -> (period1, period2, interval)
 =============================== */
 function getRangeWindow(range) {
   const now = new Date();
@@ -107,11 +107,11 @@ function getRangeWindow(range) {
 /* ===============================
    🇺🇸 미국 주식 차트 (v3+ 호환)
 =============================== */
-export async function getUSStockChart(symbol, range = "1m") {
+export async function getStockChart(symbol, range = "1m") {
   const { period1, period2, interval } = getRangeWindow(range);
 
   try {
-    // ✅ v3+에서는 period 대신 period1/period2 사용
+    // v3+에서는 period 대신 period1/period2 사용
     const result = await yahooFinance.chart(symbol, {
       period1,
       period2,
