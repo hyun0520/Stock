@@ -51,7 +51,7 @@ export default function Register({ setIsAuth }) {
 
     try {
       const res = await api.get(
-        `/api/auth/check-username`,
+        `/auth/check-username`,
         { params: { username: value } }
       );
 
@@ -97,7 +97,7 @@ export default function Register({ setIsAuth }) {
 
     try {
       /* 회원가입 */
-      await api.post("/api/auth/register", {
+      await api.post("/auth/register", {
         username,
         email,
         password,
@@ -105,7 +105,7 @@ export default function Register({ setIsAuth }) {
       });
 
       /* 자동 로그인 */
-      const res = await api.post("/api/auth/login", {
+      const res = await api.post("/auth/login", {
         email,
         password
       });
