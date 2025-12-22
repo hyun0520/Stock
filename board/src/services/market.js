@@ -1,7 +1,18 @@
-import axios from "axios";
+import { api } from "./api";
 
-const API = "http://localhost:5000/api/market";
+/* 🔥 market index */
+export const getKOSPI = async () =>
+  (await api.get("/market/index/kospi")).data;
 
-export const getKOSPI = async () => (await axios.get(`${API}/kospi`)).data;
-export const getNASDAQ = async () => (await axios.get(`${API}/nasdaq`)).data;
-export const getFX = async () => (await axios.get(`${API}/fx`)).data;
+export const getKOSDAQ = async () =>
+  (await api.get("/market/index/kosdaq")).data;
+
+export const getNASDAQ = async () =>
+  (await api.get("/market/index/nasdaq")).data;
+
+export const getSP500 = async () =>
+  (await api.get("/market/index/sp500")).data;
+
+/* 🔥 환율 */
+export const getFX = async () =>
+  (await api.get("/fx")).data;

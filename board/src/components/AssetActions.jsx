@@ -13,6 +13,8 @@ import {
 } from "recharts";
 
 /* ===== 기간 탭 ===== */
+const SHOW_YEAR_RANGES = ["3m", "1y", "5y"];
+
 const RANGES = [
   { key: "1d", label: "1일" },
   { key: "1w", label: "1주" },
@@ -103,12 +105,16 @@ const formatX = (v) => {
   }
 
   // 1주 이상이면 날짜 (예: 12/23)
-  return date.toLocaleDateString("en-US", {
-    timeZone: tz,
-    month: "2-digit",
-    day: "2-digit"
-    });
+  return date
+      .toLocaleDateString("en-CA", {
+        timeZone: tz,
+        year: SHOW_YEAR_RANGES.includes(range) ? "numeric" : undefined,
+        month: "2-digit",
+        day: "2-digit"
+      })
+      .replace(/-/g, "/");
   };
+
   const formatTooltipLabel = (value) => {
     const d = new Date(Number(value));
     if (Number.isNaN(d.getTime())) return "";
@@ -384,18 +390,20 @@ function PriceTooltip({ active, payload, label, range, market }) {
   const showTime = range === "1d"; 
 
   const dateText = showTime
-    ? date.toLocaleString("en-US", {
+    ? date.toLocaleString("en-CA", {
+        year: "numeric",
         month: "2-digit",
         day: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
         hour12: true
-      })
-    : date.toLocaleDateString("en-US", {
+      }).replace(/-/g, "/")
+    : date.toLocaleDateString("en-CA", {
+        year: SHOW_YEAR_RANGES.includes(range) ? "numeric" : undefined,
         month: "2-digit",
         day: "2-digit"
-      });
-
+      }).replace(/-/g, "/");  
+    
   const price =
     market === "US"
       ? `$${payload[0].value.toFixed(2)}`

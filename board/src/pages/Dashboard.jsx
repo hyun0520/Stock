@@ -276,37 +276,94 @@ export default function Dashboard() {
 /* ================= COMPONENTS ================= */
 
 function MarketChart({ title, data }) {
-  if (!data || data.length < 2) return null;
+  if (!data || !data.chart?.length) return null;
 
-  const last = data[data.length - 1];
-  const prev = data[data.length - 2];
-  const diff = last.value - prev.value;
-  const rate = ((diff / prev.value) * 100).toFixed(2);
+  const { price, diff, rate, chart } = data;
+  const isUp = diff >= 0;
 
   return (
     <div className="market-card">
       <h3>{title}</h3>
+
       <div className="market-price-strong">
-        <span className={`main-price ${diff >= 0 ? "up" : "down"}`}>
-          {last.value.toLocaleString()}
+        <span className={`main-price ${isUp ? "up" : "down"}`}>
+          {price.toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })}
         </span>
 
-        <span className={`price-diff ${diff >= 0 ? "up" : "down"}`}>
-          {diff >= 0 ? "▲" : "▼"} {Math.abs(diff).toFixed(2)} ({rate}%)
+        <span className={`price-diff ${isUp ? "up" : "down"}`}>
+          {isUp ? "▲" : "▼"}{" "}
+          {Math.abs(diff).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })}{" "}
+          ({rate.toFixed(2)}%)
         </span>
       </div>
 
       <ResponsiveContainer width="100%" height={180}>
-        <LineChart data={data}>
-          <XAxis dataKey="time" />
+        <LineChart data={chart}>
+          <XAxis
+            dataKey="time"
+            tickFormatter={(v) =>
+              new Date(v).toLocaleTimeString("en-US", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: true
+              })
+            }
+          />
           <YAxis domain={["auto", "auto"]} />
-          <Tooltip />
-          <Line dataKey="value" dot={false} stroke="#f97316" strokeWidth={2.5} />
+
+          <Tooltip
+            content={({ active, payload, label }) => {
+              if (!active || !payload || !payload.length) return null;
+
+              const date = new Date(label);
+              const timeText = date.toLocaleString("ko-KR", {
+                hour: "2-digit",
+                minute: "2-digit"
+              });
+
+              const value = payload[0].value;
+
+              return (
+                <div
+                  style={{
+                    background: "#ffffff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: 8,
+                    padding: "8px 10px",
+                    fontSize: 13
+                  }}
+                >
+                  <div>{timeText}</div>
+                  <div style={{ fontWeight: 600, color: "#f97316" }}>
+                    Value:{" "}
+                    {Number(value).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
+                  </div>
+                </div>
+              );
+            }}
+          />
+
+          <Line
+            dataKey="value"
+            dot={false}
+            stroke="#f97316"
+            strokeWidth={2.5}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
   );
 }
+
 
 function TopList({ title, url, type }) {
   const navigate = useNavigate();
@@ -367,12 +424,9 @@ function FxCard({ title, value, diff }) {
 
 /* ================= 모바일용 ================= */
 function MarketRow({ title, data }) {
-  if (!data || data.length < 2) return null;
+  if (!data || !data.chart?.length) return null;
 
-  const last = data[data.length - 1];
-  const prev = data[data.length - 2];
-  const diff = last.value - prev.value;
-  const rate = ((diff / prev.value) * 100).toFixed(2);
+  const { price, diff, rate, chart } = data;
   const isUp = diff >= 0;
 
   return (
@@ -380,16 +434,15 @@ function MarketRow({ title, data }) {
       <span className="market-name">{title}</span>
 
       <strong className={`market-value ${isUp ? "up" : "down"}`}>
-        {last.value.toLocaleString()}
+        {price.toLocaleString()}
       </strong>
 
       <span className={`market-rate ${isUp ? "up" : "down"}`}>
-        {isUp ? "+" : ""}{rate}%
+        {isUp ? "+" : ""}{rate.toFixed(2)}%
       </span>
 
-      {/* 🔥 미니 차트 */}
       <ResponsiveContainer width="100%" height={36}>
-        <LineChart data={data}>
+        <LineChart data={chart}>
           <Line
             dataKey="value"
             dot={false}
@@ -398,6 +451,36 @@ function MarketRow({ title, data }) {
           />
         </LineChart>
       </ResponsiveContainer>
+    </div>
+  );
+}
+
+function MarketTooltip({ active, payload, label }) {
+  if (!active || !payload || !payload.length) return null;
+
+  const value = payload[0].value;
+
+  return (
+    <div
+      style={{
+        background: "#ffffff",
+        borderRadius: 10,
+        padding: "10px 14px",
+        boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+        fontSize: 13
+      }}
+    >
+      <div style={{ color: "#6b7280", marginBottom: 6 }}>
+        {label}
+      </div>
+
+      <div style={{ color: "#f97316", fontWeight: 700 }}>
+        Value:{" "}
+        {Number(value).toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        })}
+      </div>
     </div>
   );
 }

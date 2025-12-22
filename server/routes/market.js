@@ -26,30 +26,47 @@ router.get("/index/:market", async (req, res) => {
     };
 
     const symbol = map[req.params.market];
-    if (!symbol) return res.json([]);
+    if (!symbol) return res.json(null);
 
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1d&interval=5m`;
-    const { data } = await axios.get(url, {
+    // 🔹 2일치 일봉 (전일 대비 계산용)
+    const dailyUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=2d&interval=1d`;
+    const dailyRes = await axios.get(dailyUrl, {
       headers: { "User-Agent": "Mozilla/5.0" }
     });
 
-    const result = data.chart.result?.[0];
-    if (!result) return res.json([]);
+    const daily = dailyRes.data.chart.result?.[0];
+    if (!daily) return res.json(null);
 
+    const closes = daily.indicators.quote[0].close;
+    const prevClose = closes[closes.length - 2];
+    const current = closes[closes.length - 1];
+
+    const diff = current - prevClose;
+    const rate = (diff / prevClose) * 100;
+
+    // 🔹 장중 차트 (기존 그대로)
+    const intradayUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1d&interval=5m`;
+    const intradayRes = await axios.get(intradayUrl, {
+      headers: { "User-Agent": "Mozilla/5.0" }
+    });
+
+    const result = intradayRes.data.chart.result?.[0];
     const chart = result.timestamp
       .map((t, i) => ({
-        time: new Date(t * 1000).toLocaleTimeString("ko-KR", {
-          hour: "2-digit",
-          minute: "2-digit"
-        }),
+        time: t * 1000, // 🔥 문자열 말고 timestamp 유지
         value: result.indicators.quote[0].close[i]
       }))
-      .filter(d => d.value !== null);
+      .filter(d => d.value != null);
 
-    res.json(chart);
+    res.json({
+      price: Number(current.toFixed(2)),
+      diff: Number(diff.toFixed(2)),
+      rate: Number(rate.toFixed(2)),
+      chart
+    });
   } catch (e) {
     console.error("INDEX ERROR:", e.message);
-    res.json([]);
+    res.json(null);
   }
 });
 
