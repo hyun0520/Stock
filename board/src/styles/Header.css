@@ -408,7 +408,25 @@
     height: 44px;
   }
 }
+@media (max-width: 768px) {
+  .mobile-actions {
+    display: flex;
+    flex-direction: row !important;  /* 🔥 핵심 */
+    align-items: center;
+    margin-left: auto;
+    gap: 10px;
+  }
 
+  .icon-btn,
+  .menu-btn {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+  }
+}
 /* ================= MOBILE DRAWER ================= */
 .drawer-overlay {
   position: fixed;
@@ -490,3 +508,4 @@
     height: 55px;
   }
 }
+

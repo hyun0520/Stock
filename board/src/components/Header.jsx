@@ -381,7 +381,7 @@ export default function Header({ setIsAuth, isAuth }) {
             </>
           )}
         </div>
-        <div className="mobile-actions mobile-only">
+        <div className="mobile-actions">
           <button
             className="icon-btn"
             onClick={() => {
@@ -391,7 +391,6 @@ export default function Header({ setIsAuth, isAuth }) {
           >
             🔍
           </button>
-          {/* 모바일 메뉴 버튼 */}
           <button
             className="menu-btn"
             onClick={() => setMenuOpen(true)}
