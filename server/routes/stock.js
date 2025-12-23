@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.get("/search", searchStock);
 router.get("/korea/:symbol", getStockDetail);
-router.get("/:symbol/chart", getKoreaStockChartController);
+router.get("/korea/:symbol/chart", getKoreaStockChartController);
 
 export default router;
