@@ -71,7 +71,7 @@ export default function StockDetail() {
   }, [symbol]);
 
   /* ===============================
-     ⭐ 관심종목 체크
+     관심종목 체크
   =============================== */
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -97,22 +97,23 @@ export default function StockDetail() {
   }, [symbol]);
 
   /* ===============================
-     📈 차트 (range 전달)
+     차트 (range 전달)
   =============================== */
   const fetchChartByRange = useCallback(
     async (range) => {
       try {
         const res = await api.get(
-          `/stock/${symbol}/chart`,
+          `/stock/korea/${symbol}/chart`,
           { params: { range } }
         );
 
         return Array.isArray(res.data)
           ? res.data.map((d) => ({
               ...d,
-              time: typeof d.time === "string"
-                ? new Date(d.time).getTime() // 🔥 핵심
-                : d.time
+              time:
+                typeof d.time === "string"
+                  ? new Date(d.time).getTime()
+                  : d.time
             }))
           : [];
       } catch (err) {
@@ -122,8 +123,9 @@ export default function StockDetail() {
     },
     [symbol]
   );
+
   /* ===============================
-    📊 52주 최고 / 최저 계산
+    52주 최고 / 최저 계산
   =============================== */
   const { high52Calc, low52Calc } = useMemo(() => {
     if (!chart1y.length) {
@@ -141,7 +143,7 @@ export default function StockDetail() {
 
 
   /* ===============================
-     ⭐ 관심종목 추가
+     관심종목 추가
   =============================== */
   const addToWatchlist = async () => {
     try {
@@ -234,7 +236,7 @@ export default function StockDetail() {
         {name} ({code})
       </h1>
       <p style={{ color: "#6b7280" }}>
-        🇰🇷 국내주식 · 최근 조회 기준
+        국내주식 · 최근 조회 기준
       </p>
 
       <div style={{ margin: "14px 0 18px", fontSize: 22 }}>
