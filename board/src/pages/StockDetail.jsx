@@ -15,25 +15,31 @@ export default function StockDetail() {
   const format = (v) =>
     typeof v === "number" && !isNaN(v) ? v.toLocaleString() : "—";
 
-  // 52주 계산용 차트
+  // 52주 계산용 차트 (KR 전용)
   useEffect(() => {
     let mounted = true;
 
     async function fetch1yChart() {
       try {
         const res = await api.get(
-          `/stock/${symbol}/chart`,
+          `/stock/korea/${symbol}/chart`,
           { params: { range: "1y" } }
         );
 
         if (!mounted) return;
 
         const data = Array.isArray(res.data)
-          ? res.data
+          ? res.data.map(d => ({
+              ...d,
+              time: typeof d.time === "string"
+                ? new Date(d.time).getTime()
+                : d.time
+            }))
           : [];
 
         setChart1y(data);
-      } catch {
+      } catch (err) {
+        console.error("❌ 52주 차트 로드 실패", err);
         setChart1y([]);
       }
     }

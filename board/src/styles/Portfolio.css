@@ -129,18 +129,18 @@
 }
 
 .main-amount {
-  font-size: 27px;
+  font-size: 25px;
   font-weight: 800;
 }
 
 .buy-amount-fixed {
-  font-size: 26px;
+  font-size: 24px;
   font-weight: 800;
   color: #111827;
 }
 
 .profit-amount {
-  font-size: 25px;
+  font-size: 20px;
   font-weight: 800;
 }
 .profit-amount {
@@ -201,17 +201,17 @@
   font-weight: 600;
   color: #6b7280;
 }
-
+.pc-only { display: block; }
+.mobile-only { display: none; }
 /* ===============================
    Mobile Layout (Portfolio)
 ================================ */
 @media (max-width: 768px) {
+  .pc-only { display: none; }
+  .mobile-only { display: block; }
+}
 
-  /* ===== 전체 간격 줄이기 ===== */
-  .portfolio-wrap {
-    padding: 0 14px;
-  }
-
+@media (max-width: 768px) {
   h1 {
     font-size: 24px;
     margin-bottom: 16px;
@@ -228,12 +228,7 @@
     gap: 6px;
   }
 
-  .main-amount,
-  .buy-amount-fixed,
-  .profit-amount {
-    font-size: 20px;
-  }
-
+ 
   /* 차트 종목간 간격 */
   .portfolio-chart-row {
     flex-direction: column;
@@ -247,37 +242,19 @@
   }
 
   .chart-box svg {
-    display: block;        /* SVG baseline 여백 제거 */
+    display: block;       
   }
 
   .legend-row {
     grid-template-columns: 14px 1fr auto;
   }
 
-  /* ===== 카드 리스트 ===== */
-  .portfolio-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .portfolio-card .right {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .portfolio-card button {
-    width: auto;
-    height: auto;
-    padding: 6px 10px;
-  }
 }
 
 /* ===============================
    Mobile Layout (Portfolio)
 ================================ */
 @media (max-width: 768px) {
-
   /* ===== 전체 레이아웃 ===== */
   .portfolio-wrap {
     padding: 0 14px;
@@ -290,23 +267,6 @@
     margin-bottom: 14px;
   }
 
-  /* ===== 요약 카드 ===== */
-  .portfolio-summary.dashboard-style {
-    grid-template-columns: 1fr;
-    gap: 16px;
-    padding: 20px;
-    margin-bottom: 24px;
-  }
-
-  .summary-item {
-    gap: 6px;
-  }
-
-  .main-amount,
-  .buy-amount-fixed,
-  .profit-amount {
-    font-size: 20px;
-  }
 
   /* ===== 보유자산 ===== */
 
@@ -348,75 +308,158 @@
     grid-template-columns: 14px 1fr auto;
     margin-top: 0;
   }
-
-  /* ===== 종목 카드 ===== */
-  .portfolio-card {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 12px;
-  }
-
-  .portfolio-card .right {
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-
-  .portfolio-card button {
-    width: auto;
-    height: auto;
-    padding: 6px 10px;
-  }
 }
+
+/* ===============================
+   🔥 Force price to right column
+================================ */
 
 @media (max-width: 768px) {
 
-  /* 카드 전체 */
-  .portfolio-card {
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
-    border-radius: 14px;
-  }
-
-  /* ===== 카드 상단 정보 영역 ===== */
-  .portfolio-card .left {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  /* ===== 카드 하단 액션 영역 ===== */
-  .portfolio-card .right {
-    margin-top: auto;              /* 🔥 핵심 */
+  /* 🔥 종목명 + 수량을 한 줄로 */
+  .mobile-card .mobile-left {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding-top: 12px;
+    gap: 8px;              /* 이름 ↔ 수량 간격 */
   }
 
-  /* 손익 텍스트 */
-  .portfolio-card .profit {
-    font-size: 14px;
+  .mobile-card .mobile-left .name {
+    font-size: 17px;
     font-weight: 700;
     white-space: nowrap;
   }
 
-  /* 버튼 그룹 */
-  .portfolio-card .right button {
-    min-width: 60px;
-    height: 36px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
+  .mobile-card .mobile-left .qty {
+    font-size: 14px;
+    color: #9ca3af;
+    white-space: nowrap;
   }
 
-  .edit-btn {
-    background: #2563eb;
+}
+@media (max-width: 768px) {
+
+  /* 🔥 가격 + 손익을 같은 줄로 */
+  .mobile-card .mobile-right {
+    display: flex;
+    flex-direction: row;        /* ← 핵심 */
+    align-items: center;
+    gap: 10px;                  /* 가격 ↔ 손익 간격 */
   }
 
-  .delete-btn {
-    background: #dc2626;
+    .mobile-right {
+    margin-left: auto;
+    text-align: right;
+  }
+}
+/* ===============================
+   Mobile Detail Modal (Kiwoom Style)
+================================ */
+@media (max-width: 768px) {
+
+  /* 배경 오버레이 */
+  .detail-overlay {
+    position: fixed;
+    inset: 0;                      /* top, right, bottom, left = 0 */
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 9999;
+
+    display: flex;
+    align-items: flex-end;         /* 🔥 아래에서 올라오는 느낌 */
+    justify-content: center;
+  }
+
+  /* 모달 본체 */
+  .detail-modal {
+    width: 100%;
+    max-width: 420px;
+    background: #111827;
+    color: white;
+    position: relative;
+    border-radius: 16px 16px 0 0;
+    padding: 20px;
+
+    animation: slideUp 0.25s ease-out;
+  }
+
+  /* 닫기 버튼 */
+  .detail-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+
+    background: none;
+    border: none;
+    color: #9ca3af;
+    font-size: 22px;
+    cursor: pointer;
+  }
+
+  /* 제목 */
+  .detail-modal h2 {
+    margin-bottom: 16px;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  /* 항목 줄 */
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    font-size: 15px;
+    border-bottom: 1px solid #1f2937;
+  }
+
+  .detail-row:last-child {
+    border-bottom: none;
+  }
+
+  .detail-row span:first-child {
+    color: #9ca3af;
+  }
+
+  .detail-row.profit span:last-child {
+    font-weight: 700;
+    color: #22c55e;
+  }
+
+  /* 버튼 영역 */
+  .detail-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .detail-actions button {
+    flex: 1;
+    padding: 14px 0;
+    border-radius: 12px;
+    border: none;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .detail-actions .sell {
+    background: #6366f1;
+    color: white;
+  }
+
+  .detail-actions .buy {
+    background: #ef4444;
+    color: white;
+  }
+  .detail-header {
+    font-size: 18px;
+    margin-bottom: 9px;
+  }
+  /* 슬라이드 애니메이션 */
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 }

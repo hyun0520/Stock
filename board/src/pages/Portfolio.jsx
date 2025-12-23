@@ -16,11 +16,10 @@ const USD_TO_KRW = 1474;
 export default function Portfolio() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
-
   const [editId, setEditId] = useState(null);
   const [qty, setQty] = useState("");
-  const [price, setPrice] = useState(""); // US는 달러 입력
-
+  const [price, setPrice] = useState("");
+  const [selectedItem, setSelectedItem] = useState(null);
   // 현재가 저장 (id → price, 원화 기준)
   const [priceMap, setPriceMap] = useState({});
 
@@ -268,62 +267,156 @@ export default function Portfolio() {
         const isPlus = profit >= 0;
 
         return (
-          <div className="portfolio-card" key={item._id}>
-            <div className="left">
-              <strong>{item.name} ({item.symbol})</strong>
-              <p>{item.market}</p>
+          <div
+            className="portfolio-card"
+            key={item._id}
+            onClick={() => setSelectedItem(item)}
+          >
+            {/* ===============================
+                모바일 전용 
+            =============================== */}
+              <div className="mobile-only mobile-card">
+                {/* 왼쪽 */}
+                <div className="mobile-left">
+                  <div className="name">{item.name}</div>
+                  <div className="qty">{item.quantity}주</div>
+                </div>
+
+                {/* 오른쪽 */}
+                <div className="mobile-right">
+                  <div className="price">{evalTotal.toLocaleString()}원</div>
+                  <div className={`profit ${isPlus ? "plus" : "minus"}`}>
+                    {profit.toLocaleString()}원
+                    <span className="rate"> ({rate}%)</span>
+                  </div>
+                </div>
+              </div>
+              
+            {/* ===============================
+                🖥 PC 전용 (기존 UI 유지)
+            =============================== */}
+            <div className="pc-only">
+              <div className="left">
+                <strong>{item.name} ({item.symbol})</strong>
+                <p>{item.market}</p>
+              </div>
+
+              {editId === item._id ? (
+                <div className="edit-box">
+                  <div className="edit-field">
+                    <label>수량</label>
+                    <input
+                      type="number"
+                      value={qty}
+                      onChange={(e) => setQty(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="edit-field">
+                    <label>금액</label>
+                    <input
+                      type="number"
+                      value={price}
+                      placeholder={item.market === "US" ? "$" : "원"}
+                      onChange={(e) => setPrice(e.target.value)}
+                    />
+                  </div>
+
+                  <button className="save-btn" onClick={() => saveEdit(item._id)}>
+                    저장
+                  </button>
+                  <button className="cancel-btn" onClick={() => setEditId(null)}>
+                    취소
+                  </button>
+                </div>
+              ) : (
+                <div className="right">
+                  <span>보유: {item.quantity}</span>
+                  <span>매수가: {item.buyPrice.toLocaleString()}원</span>
+                  <span>
+                    현재가: <strong>{current.toLocaleString()}원</strong>
+                  </span>
+                  <span>평가금액: {evalTotal.toLocaleString()}원</span>
+                  <span className={isPlus ? "profit plus" : "profit minus"}>
+                    {isPlus ? "▲" : "▼"} {profit.toLocaleString()}원 ({rate}%)
+                  </span>
+                  <button className="edit-btn" onClick={() => startEdit(item)}>
+                    수정
+                  </button>
+                  <button className="delete-btn" onClick={() => handleDelete(item._id)}>
+                    삭제
+                  </button>
+                </div>
+              )}
             </div>
-
-            {editId === item._id ? (
-              <div className="edit-box">
-                <div className="edit-field">
-                  <label>수량</label>
-                  <input
-                    type="number"
-                    value={qty}
-                    onChange={(e) => setQty(e.target.value)}
-                  />
-                </div>
-
-                <div className="edit-field">
-                  <label>금액</label>
-                  <input
-                    type="number"
-                    value={price}
-                    placeholder={item.market === "US" ? "$" : "원"}
-                    onChange={(e) => setPrice(e.target.value)}
-                  />
-                </div>
-
-                <button className="save-btn" onClick={() => saveEdit(item._id)}>
-                  저장
-                </button>
-                <button className="cancel-btn" onClick={() => setEditId(null)}>
-                  취소
-                </button>
-              </div>
-            ) : (
-              <div className="right">
-                <span>보유: {item.quantity}</span>
-                <span>매수가: {item.buyPrice.toLocaleString()}원</span>
-                <span>
-                  현재가: <strong>{current.toLocaleString()}원</strong>
-                </span>
-                <span>평가금액: {evalTotal.toLocaleString()}원</span>
-                <span className={isPlus ? "profit plus" : "profit minus"}>
-                  {isPlus ? "▲" : "▼"} {profit.toLocaleString()}원 ({rate}%)
-                </span>
-                <button className="edit-btn" onClick={() => startEdit(item)}>
-                  수정
-                </button>
-                <button className="delete-btn" onClick={() => handleDelete(item._id)}>
-                  삭제
-                </button>
-              </div>
-            )}
           </div>
         );
       })}
+      {selectedItem && (() => {
+        const current = priceMap[selectedItem._id] || 0;
+        const evalTotal = current * selectedItem.quantity;
+        const buyTotal = selectedItem.buyPrice * selectedItem.quantity;
+        const profit = evalTotal - buyTotal;
+        const rate =
+          buyTotal > 0 ? ((profit / buyTotal) * 100).toFixed(2) : 0;
+        const isPlus = profit >= 0;
+
+        return (
+          <div
+            className="detail-overlay mobile-only"
+            onClick={() => setSelectedItem(null)}
+          >
+            <div
+              className="detail-modal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="detail-close"
+                onClick={() => setSelectedItem(null)}
+              >
+                ×
+              </button>
+
+              <h2>잔고내역 상세</h2>
+
+              {/* 종목명 */}
+              <div className="detail-header">
+                <strong>
+                  {selectedItem.name} ({selectedItem.symbol})
+                </strong>
+              </div>
+
+              <div className="detail-row">
+                <span>보유수량</span>
+                <span>{selectedItem.quantity}주</span>
+              </div>
+
+              <div className="detail-row">
+                <span>매수가</span>
+                <span>{selectedItem.buyPrice.toLocaleString()}원</span>
+              </div>
+
+              <div className="detail-row">
+                <span>현재가</span>
+                <span>{current.toLocaleString()}원</span>
+              </div>
+
+              <div className="detail-row">
+                <span>평가금액</span>
+                <span>{evalTotal.toLocaleString()}원</span>
+              </div>
+
+              <div className={`detail-row profit ${isPlus ? "plus" : "minus"}`}>
+                <span>평가손익</span>
+                <span>
+                  {isPlus ? "▲ " : "▼ "}
+                  {profit.toLocaleString()}원 ({rate}%)
+                </span>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
