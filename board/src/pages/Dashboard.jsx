@@ -245,7 +245,12 @@ export default function Dashboard() {
 
       {/* ===== FX ===== */}
       <section className="fx-section">
-        <h2>EXCHANGE RATE</h2>
+        <div className="fx-header">
+          <h2>EXCHANGE RATE</h2>
+          <span className="fx-source">
+            {fx?.source && `• ${fx.source}`}
+          </span>
+        </div>
         <div className="fx-grid">
           <FxCard
             title="미국 USD"
@@ -405,22 +410,29 @@ function TopList({ title, url, type }) {
 
 
 function FxCard({ title, value, diff }) {
+  const abs = Math.abs(diff);
   const isUp = diff >= 0;
+
+  const display =
+    abs === 0
+      ? "0.00%"
+      : abs < 0.01
+        ? "< 0.01%"
+        : `${abs.toFixed(2)}%`;
 
   return (
     <div className="fx-card">
       <span className="fx-title">{title}</span>
-
-      {/* 🔥 숫자 + 등락률 묶기 */}
       <div className="fx-main">
         <strong>{value}</strong>
         <span className={isUp ? "plus" : "minus"}>
-          {isUp ? "▲" : "▼"} {Math.abs(diff).toFixed(2)}%
+          {isUp ? "▲" : "▼"} {display}
         </span>
       </div>
     </div>
   );
 }
+
 
 /* ================= 모바일용 ================= */
 function MarketRow({ title, data }) {

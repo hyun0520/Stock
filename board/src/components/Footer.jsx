@@ -20,7 +20,12 @@ export default function Footer() {
           </div>
         </div>
         <div className="footer-right">
-          <button className="related-btn">
+        <button
+            className="related-btn"
+            onClick={() =>
+              window.open("https://chunghyunleeportfolio.netlify.app/", "_blank")
+            }
+          >
             관련사이트 <span>＋</span>
           </button>
         </div>

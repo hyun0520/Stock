@@ -148,7 +148,7 @@ export default function Header({ setIsAuth, isAuth }) {
   };
 
   /* ===============================
-     🔹 렌더 리스트
+    렌더 리스트
   =============================== */
   const renderList = query === "" ? recentItems : searchItems;
 
@@ -165,7 +165,7 @@ export default function Header({ setIsAuth, isAuth }) {
   ];
 
   /* ===============================
-     ⌨️ 키보드 이동
+     키보드 이동
   =============================== */
   useEffect(() => {
     if (!searchOpen) return;
@@ -224,7 +224,7 @@ export default function Header({ setIsAuth, isAuth }) {
     const price = prices[item.symbol];
     const isRecent = query === "";
 
-    // ⭐ 국내주식(KR)만 "보통주" 제거해서 표시
+    //국내주식(KR)만 "보통주" 제거해서 표시
     const displayName =
       item.type === "KR"
         ? item.name.replace(/보통주/g, "").trim()

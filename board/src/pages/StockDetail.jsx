@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../services/api";
 import AssetActions from "../components/AssetActions";
+import { useMemo } from "react";
 
 export default function StockDetail() {
   const { symbol } = useParams();
@@ -10,12 +11,39 @@ export default function StockDetail() {
   const [loading, setLoading] = useState(true);
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
-
+  const [chart1y, setChart1y] = useState([]);
   const format = (v) =>
     typeof v === "number" && !isNaN(v) ? v.toLocaleString() : "—";
 
+  // 52주 계산용 차트
+  useEffect(() => {
+    let mounted = true;
+
+    async function fetch1yChart() {
+      try {
+        const res = await api.get(
+          `/stock/${symbol}/chart`,
+          { params: { range: "1y" } }
+        );
+
+        if (!mounted) return;
+
+        const data = Array.isArray(res.data)
+          ? res.data
+          : [];
+
+        setChart1y(data);
+      } catch {
+        setChart1y([]);
+      }
+    }
+
+    fetch1yChart();
+    return () => (mounted = false);
+  }, [symbol]);
+
   /* ===============================
-     🇰🇷 국내주식 상세 정보
+     국내주식 상세 정보
   =============================== */
   useEffect(() => {
     let mounted = true;
@@ -27,12 +55,12 @@ export default function StockDetail() {
           ? res.data[0]
           : res.data;
 
-        if (mounted) setDetail(data);
+        mounted && setDetail(data);
       } catch (err) {
         console.error("❌ korea stock detail error", err);
-        if (mounted) setError("주식 정보를 불러오지 못했습니다.");
+        mounted && setError("주식 정보를 불러오지 못했습니다.");
       } finally {
-        if (mounted) setLoading(false);
+        mounted && setLoading(false);
       }
     }
 
@@ -56,7 +84,7 @@ export default function StockDetail() {
         });
 
         const exists = res.data.some(
-          (item) => item.symbol === symbol && item.market === "KR"
+          (item) => item.symbol === symbol && item.market === "KOREA"
         );
 
         setAdded(exists);
@@ -75,11 +103,18 @@ export default function StockDetail() {
     async (range) => {
       try {
         const res = await api.get(
-          `/stock/korea/${symbol}/chart`,
+          `/stock/${symbol}/chart`,
           { params: { range } }
         );
 
-        return Array.isArray(res.data) ? res.data : [];
+        return Array.isArray(res.data)
+          ? res.data.map((d) => ({
+              ...d,
+              time: typeof d.time === "string"
+                ? new Date(d.time).getTime() // 🔥 핵심
+                : d.time
+            }))
+          : [];
       } catch (err) {
         console.error("❌ chart fetch error", err);
         return [];
@@ -87,6 +122,23 @@ export default function StockDetail() {
     },
     [symbol]
   );
+  /* ===============================
+    📊 52주 최고 / 최저 계산
+  =============================== */
+  const { high52Calc, low52Calc } = useMemo(() => {
+    if (!chart1y.length) {
+      return { high52Calc: null, low52Calc: null };
+    }
+
+    const prices = chart1y.map(d => d.price);
+
+    return {
+      high52Calc: Math.max(...prices),
+      low52Calc: Math.min(...prices)
+    };
+  }, [chart1y]);
+
+
 
   /* ===============================
      ⭐ 관심종목 추가
@@ -104,7 +156,7 @@ export default function StockDetail() {
         {
           symbol: detail.symbol,
           name: detail.name,
-          market: "KR"
+          market: "KOREA"
         },
         {
           headers: { Authorization: `Bearer ${token}` }
@@ -119,7 +171,7 @@ export default function StockDetail() {
   };
 
   /* ===============================
-     📌 포트폴리오 추가
+     포트폴리오 추가
   =============================== */
   const addToPortfolio = async (qty, buy) => {
     const token = localStorage.getItem("token");
@@ -135,7 +187,7 @@ export default function StockDetail() {
         {
           symbol: detail.symbol,
           name: detail.name,
-          market: "KR",
+          market: "KOREA",
           quantity: Number(qty),
           buyPrice: Number(buy)
         },
@@ -169,10 +221,9 @@ export default function StockDetail() {
     open,
     high,
     low,
-    volume,
-    high52,
-    low52
+    volume
   } = detail;
+
 
   const isUp = change > 0;
   const isDown = change < 0;
@@ -204,7 +255,7 @@ export default function StockDetail() {
         fetchChart={fetchChartByRange}
         defaultRange="1d"
         chartColor="#ff8a00"
-        market="KR"
+        market="KOREA"
         price={price}
         prevPrice={prevPrice}
         change={change}
@@ -213,8 +264,8 @@ export default function StockDetail() {
         high={high}
         low={low}
         volume={volume}
-        high52={high52}
-        low52={low52}
+        high52={high52Calc}
+        low52={low52Calc}
         added={added}
         disabled={!price}
         onAddWatch={addToWatchlist}

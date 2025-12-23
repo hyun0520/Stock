@@ -119,7 +119,7 @@ const formatX = (v) => {
     const d = new Date(Number(value));
     if (Number.isNaN(d.getTime())) return "";
 
-    // ✅ 1일만 시간 포함
+    // 1일만 시간 포함
     if (range === "1d") {
       return d.toLocaleString("en-US", {
         timeZone: "Asia/Seoul",
@@ -131,7 +131,7 @@ const formatX = (v) => {
       });
     }
 
-    // ✅ 1주 이상은 날짜만
+    // 1주 이상은 날짜만
     return d.toLocaleDateString("en-US", {
       timeZone: "Asia/Seoul",
       month: "2-digit",
@@ -179,15 +179,15 @@ const formatX = (v) => {
             ))}
           </div>
 
-          <div className="chart-box">
-            {loading ? (
-              <div className="chart-loading">차트 로딩중...</div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={chart}
-                    margin={{ top: 6, right: 8, left: 16, bottom: 0 }}
-                  >
+<div className="chart-box" style={{ width: "100%", height: 260 }}>
+  {loading ? (
+    <div className="chart-loading">차트 로딩중...</div>
+  ) : (
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart
+        data={chart}
+        margin={{ top: 6, right: 8, left: 16, bottom: 0 }}
+      >
                   <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
                   <XAxis
                     dataKey="time"
