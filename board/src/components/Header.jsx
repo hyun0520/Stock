@@ -13,8 +13,14 @@ export default function Header({ setIsAuth, isAuth }) {
   const [prices, setPrices] = useState({});
   const [activeIndex, setActiveIndex] = useState(-1);
   const listRef = useRef(null);
-  const [menuOpen, setMenuOpen] = useState(false); // 모바일 메뉴
-
+  const [menuOpen, setMenuOpen] = useState(false);
+  const handleAuthNavigate = (path) => {
+    if (!isAuth) {
+      navigate("/login");
+      return;
+    }
+    navigate(path);
+  };
   /* ===============================
      최근 검색 로드
   =============================== */
@@ -310,8 +316,14 @@ export default function Header({ setIsAuth, isAuth }) {
   };
   /* 모바일 메뉴 먼저 닫고 페이지 이동 */
   const handleMenuNavigate = (path) => {
-    setMenuOpen(false);      
-    navigate(path);         
+    setMenuOpen(false);
+
+    if (!isAuth) {
+      navigate("/login");
+      return;
+    }
+
+    navigate(path);
   };
   return (
     <>
@@ -326,13 +338,13 @@ export default function Header({ setIsAuth, isAuth }) {
         </div>
 
         <nav className="header-menu desktop-only">
-          <span onClick={() => navigate("/dashboard")}>
+          <span onClick={() => handleAuthNavigate("/dashboard")}>
             대시보드
           </span>
-          <span onClick={() => navigate("/watchlist")}>
+          <span onClick={() => handleAuthNavigate("/watchlist")}>
             관심종목
           </span>
-          <span onClick={() => navigate("/portfolio")}>
+          <span onClick={() => handleAuthNavigate("/portfolio")}>
             포트폴리오
           </span>
           <span>도움말</span>

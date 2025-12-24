@@ -1,0 +1,111 @@
+/* ===============================
+   Home (Landing)
+================================ */
+
+.home-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 60px 20px 100px;
+}
+
+/* ===== Hero ===== */
+.home-hero {
+  text-align: center;
+  margin-bottom: 70px;
+}
+
+.home-title {
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 16px;
+}
+
+.home-title span {
+  color: #ff8a00;
+}
+
+.home-subtitle {
+  font-size: 18px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 36px;
+}
+
+.home-cta {
+  padding: 14px 32px;
+  border-radius: 999px;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+
+  background: linear-gradient(135deg, #ff8a00, #ffb347);
+  color: #fff;
+
+  box-shadow: 0 10px 30px rgba(255, 138, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.home-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(255, 138, 0, 0.45);
+}
+
+/* ===== Features ===== */
+.home-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.feature-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 28px 24px;
+  text-align: center;
+
+  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+}
+
+.feature-card .icon {
+  font-size: 36px;
+  margin-bottom: 14px;
+}
+
+.feature-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.feature-card p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+  .home-title {
+    font-size: 28px;
+  }
+
+  .home-subtitle {
+    font-size: 15px;
+  }
+
+  .home-features {
+    grid-template-columns: 1fr;
+  }
+
+  .home-wrapper {
+    padding: 40px 16px 80px;
+  }
+}

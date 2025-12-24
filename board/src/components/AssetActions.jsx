@@ -25,6 +25,9 @@ const RANGES = [
 ];
 
 export default function AssetActions({
+  name,
+  symbol,
+  marketLabel,
   price,
   change,
   rate,
@@ -35,12 +38,10 @@ export default function AssetActions({
   volume,
   high52,
   low52,
-
   added,
   disabled,
   onAddWatch,
   onAddPortfolio,
-
   fetchChart,
   chartColor = "#ff8a00",
   defaultRange = "1d",
@@ -164,30 +165,56 @@ const formatX = (v) => {
 
   return (
     <>
-      {/* ================= 차트 ================= */}
-      {fetchChart && (
-        <section className="asset-chart">
-          <div className="range-tabs">
-            {RANGES.map((r) => (
-              <button
-                key={r.key}
-                className={range === r.key ? "active" : ""}
-                onClick={() => setRange(r.key)}
-              >
-                {r.label}
-              </button>
-            ))}
-          </div>
+{/* ================= 종목 헤더 ================= */}
+<section className="asset-header">
+  <h1 className="asset-title">
+    {name} <span>({symbol})</span>
+  </h1>
 
-<div className="chart-box" style={{ width: "100%", height: 260 }}>
-  {loading ? (
-    <div className="chart-loading">차트 로딩중...</div>
-  ) : (
-    <ResponsiveContainer width="100%" height="100%">
-      <LineChart
-        data={chart}
-        margin={{ top: 6, right: 8, left: 16, bottom: 0 }}
-      >
+  <p className="asset-sub">
+    {marketLabel} · 최근 조회 기준
+  </p>
+
+  <div className="asset-price-row">
+    <strong className="price">
+      {price?.toLocaleString()}원
+    </strong>
+
+    <span
+      className={`change ${
+        change > 0 ? "up" : change < 0 ? "down" : ""
+      }`}
+    >
+      {change > 0 && "▲ "}
+      {change < 0 && "▼ "}
+      {change?.toLocaleString()} ({rate}%)
+    </span>
+  </div>
+</section>
+
+{/* ================= 차트 ================= */}
+      {fetchChart && (
+          <section className="asset-chart">
+            <div className="range-tabs">
+              {RANGES.map((r) => (
+                <button
+                  key={r.key}
+                  className={range === r.key ? "active" : ""}
+                  onClick={() => setRange(r.key)}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>      
+            <div className="chart-box" style={{ width: "100%", height: 260 }}>
+              {loading ? (
+                <div className="chart-loading">차트 로딩중...</div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart
+                    data={chart}
+                    margin={{ top: 6, right: 8, left: 16, bottom: 0 }}
+                  >
                   <CartesianGrid stroke="#eee" strokeDasharray="3 3" />
                   <XAxis
                     dataKey="time"
@@ -234,8 +261,6 @@ const formatX = (v) => {
                               stroke="#1f2937"
                               fillOpacity={1}
                             />
-                            {/* 🔥 뒤 숫자 완전 가리는 덮개 (이게 핵심) */}
-
                             {/* 텍스트 */}
                             <text
                               x={x - 40}
@@ -251,8 +276,6 @@ const formatX = (v) => {
                       }}
                     />
                   )}
-
-
                   <Tooltip
                     content={
                       <PriceTooltip

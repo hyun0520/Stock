@@ -503,9 +503,22 @@
   cursor: pointer;
 }
 
+.mobile-actions {
+  display: none;
+}
+
 @media (max-width: 768px) {
   .logo {
     height: 55px;
   }
 }
 
+@media (max-width: 768px) {
+  .mobile-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-left: auto;
+    gap: 10px;
+  }
+}

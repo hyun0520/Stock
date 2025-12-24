@@ -200,54 +200,37 @@ export default function StockDetailUS() {
   if (!detail) return <div style={{ padding: 40 }}>데이터 없음</div>;
 
   return (
-    <div style={{ padding: "40px", maxWidth: 1100, margin: "0 auto" }}>
-      <h1>
-        {detail.name} ({detail.symbol})
-      </h1>
-      <p style={{ color: "#6b7280" }}>
-        🇺🇸 미국주식 · 최근 조회 기준
-      </p>
-
-      <div style={{ margin: "14px 0 18px", fontSize: 22 }}>
-        현재가: <strong>${price.toLocaleString()}</strong>
-
-        <span
-          style={{
-            marginLeft: 12,
-            color: isUp ? "#16a34a" : isDown ? "#dc2626" : "#9ca3af"
-          }}
-        >
-          {isUp && "▲ "}
-          {isDown && "▼ "}
-          {diff >= 0 ? "+" : ""}
-          ${Math.abs(diff).toLocaleString()} (
-          {rate >= 0 ? "+" : ""}
-          {rate.toFixed(2)}%)
-        </span>
-      </div>
-
+    <div className="stock-container">
       <AssetActions
+        name={detail.name}
+        symbol={detail.symbol}
+        marketLabel="미국주식"
+
+        price={price}
+        change={diff}
+        rate={rate}
+        prevPrice={detail.prevPrice}
+
         fetchChart={fetchChartByRange}
         chartColor="#ff8a00"
         market="US"
-        price={price}
-        prevPrice={detail.prevPrice}
-        change={diff}
-        rate={rate}
+        defaultRange="1d"
+
         open={detail.open}
         high={detail.high}
         low={detail.low}
         volume={detail.volume}
         high52={detail.high52}
         low52={detail.low52}
+
         added={added}
         disabled={price <= 0}
         onAddWatch={addToWatchlist}
         onAddPortfolio={addToPortfolio}
-        defaultRange="1d"
       />
 
-      {error && <p style={{ marginTop: 10, color: "red" }}>{error}</p>}
+      {error && <p className="stock-error">{error}</p>}
     </div>
   );
+
 }

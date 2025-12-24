@@ -217,3 +217,55 @@
 .stock-rate.down {
   color: #3b82f6;
 }
+
+/* ===== Stock Detail Container ===== */
+.stock-container {
+  padding: 40px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* 제목 */
+.stock-title {
+  font-size: 32px; /* h1 기본 느낌 유지 */
+  font-weight: 700;
+  margin: 0;
+}
+
+/* 서브텍스트 */
+.stock-subtitle {
+  color: #6b7280;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* 현재가 라인 */
+.stock-price-line {
+  margin: 14px 0 18px;
+  font-size: 22px;
+}
+
+/* 등락 */
+.stock-change {
+  margin-left: 12px;
+}
+
+/* 상승 */
+.stock-change.up {
+  color: #ef4444;
+}
+
+/* 하락 */
+.stock-change.down {
+  color: #3b82f6;
+}
+
+/* 보합 */
+.stock-change.flat {
+  color: #9ca3af;
+}
+
+/* 에러 */
+.stock-error {
+  color: red;
+}

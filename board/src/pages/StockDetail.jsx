@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { api } from "../services/api";
 import AssetActions from "../components/AssetActions";
 import { useMemo } from "react";
+import "../styles/StockDetail.css";
 
 export default function StockDetail() {
   const { symbol } = useParams();
@@ -63,7 +64,7 @@ export default function StockDetail() {
 
         mounted && setDetail(data);
       } catch (err) {
-        console.error("❌ korea stock detail error", err);
+        console.error("korea stock detail error", err);
         mounted && setError("주식 정보를 불러오지 못했습니다.");
       } finally {
         mounted && setLoading(false);
@@ -95,7 +96,7 @@ export default function StockDetail() {
 
         setAdded(exists);
       } catch (err) {
-        console.error("❌ watchlist check failed", err);
+        console.error("watchlist check failed", err);
       }
     }
 
@@ -123,7 +124,7 @@ export default function StockDetail() {
             }))
           : [];
       } catch (err) {
-        console.error("❌ chart fetch error", err);
+        console.error("chart fetch error", err);
         return [];
       }
     },
@@ -232,42 +233,20 @@ export default function StockDetail() {
     volume
   } = detail;
 
-
-  const isUp = change > 0;
-  const isDown = change < 0;
-
   return (
-    <div style={{ padding: "40px", maxWidth: 1100, margin: "0 auto" }}>
-      <h1>
-        {name} ({code})
-      </h1>
-      <p style={{ color: "#6b7280" }}>
-        국내주식 · 최근 조회 기준
-      </p>
-
-      <div style={{ margin: "14px 0 18px", fontSize: 22 }}>
-        현재가: <strong>{format(price)}원</strong>
-        <span
-          style={{
-            marginLeft: 12,
-            color: isUp ? "#ef4444" : isDown ? "#3b82f6" : "#9ca3af"
-          }}
-        >
-          {isUp && "▲ "}
-          {isDown && "▼ "}
-          {format(change)} ({rate}%)
-        </span>
-      </div>
-
+    <div className="stock-container">
       <AssetActions
+        name={name}
+        symbol={code}
+        marketLabel="국내주식"
+        price={price}
+        change={change}
+        rate={rate}
+        prevPrice={prevPrice}
         fetchChart={fetchChartByRange}
         defaultRange="1d"
         chartColor="#ff8a00"
         market="KOREA"
-        price={price}
-        prevPrice={prevPrice}
-        change={change}
-        rate={rate}
         open={open}
         high={high}
         low={low}
@@ -279,8 +258,7 @@ export default function StockDetail() {
         onAddWatch={addToWatchlist}
         onAddPortfolio={addToPortfolio}
       />
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="stock-error">{error}</p>}
     </div>
   );
 }

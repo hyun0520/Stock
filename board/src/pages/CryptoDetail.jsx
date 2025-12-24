@@ -4,16 +4,43 @@ import { api } from "../services/api";
 import AssetActions from "../components/AssetActions";
 
 export default function CryptoDetail() {
-  const { market } = useParams(); // 예: KRW-XRP
-
+  const { market } = useParams();
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
+  const [prevPrice, setPrevPrice] = useState(null);
 
   /* ===============================
-     📌 코인 상세 정보
+     코인 전일가 정보
+  =============================== */
+  useEffect(() => {
+    let mounted = true;
+
+    async function fetchPrevPrice() {
+      try {
+        const res = await api.get(
+          `/crypto/candles/${market}`,
+          { params: { range: "1d", limit: 2 } }
+        );
+
+        if (!mounted) return;
+
+        // 두 번째 캔들이 전일 종가
+        if (Array.isArray(res.data) && res.data.length >= 2) {
+          setPrevPrice(res.data[1].trade_price);
+        }
+      } catch (e) {
+        console.error("prevPrice fetch failed", e);
+      }
+    }
+
+    fetchPrevPrice();
+    return () => (mounted = false);
+  }, [market]);
+
+  /* ===============================
+     코인 상세 정보
   =============================== */
   useEffect(() => {
     let mounted = true;
@@ -25,7 +52,7 @@ export default function CryptoDetail() {
         setDetail(res.data);
         setError("");
       } catch (err) {
-        console.error("❌ crypto detail error", err);
+        console.error("crypto detail error", err);
         if (mounted) setError("코인 정보를 불러오지 못했습니다.");
       } finally {
         if (mounted) setLoading(false);
@@ -39,7 +66,7 @@ export default function CryptoDetail() {
   }, [market]);
 
   /* ===============================
-     ✅ 이미 관심종목인지 체크
+    이미 관심종목인지 체크
   =============================== */
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -59,7 +86,7 @@ export default function CryptoDetail() {
 
         setAdded(exists);
       } catch (err) {
-        console.error("❌ watchlist check failed", err);
+        console.error("watchlist check failed", err);
       }
     }
 
@@ -67,7 +94,7 @@ export default function CryptoDetail() {
   }, [market]);
 
   /* ===============================
-     📈 차트 데이터
+    차트 데이터
   =============================== */
   const fetchChartByRange = useCallback(
     async (range) => {
@@ -84,7 +111,7 @@ export default function CryptoDetail() {
             }))
           : [];
       } catch (err) {
-        console.error("❌ chart fetch error", err);
+        console.error("chart fetch error", err);
         return [];
       }
     },
@@ -92,7 +119,7 @@ export default function CryptoDetail() {
   );
 
   /* ===============================
-     ⭐ 관심종목 추가
+     관심종목 추가
   =============================== */
   const addToWatchlist = useCallback(async () => {
     try {
@@ -125,13 +152,13 @@ export default function CryptoDetail() {
       setAdded(true);
       setError("");
     } catch (err) {
-      console.error("❌ add watchlist failed", err);
+      console.error("add watchlist failed", err);
       setError("이미 관심종목이거나 오류가 발생했습니다.");
     }
   }, [detail, market]);
 
   /* ===============================
-     📌 포트폴리오 추가
+     포트폴리오 추가
   =============================== */
   const addToPortfolio = async (qty, buy) => {
     const token = localStorage.getItem("token");
@@ -162,7 +189,7 @@ export default function CryptoDetail() {
 
       return true;
     } catch (err) {
-      console.error("❌ portfolio add error", err);
+      console.error("portfolio add error", err);
       return (
         err.response?.data?.message ||
         "이미 등록되었거나 오류가 발생했습니다."
@@ -171,7 +198,7 @@ export default function CryptoDetail() {
   };
 
   /* ===============================
-     🔄 Render
+    Render
   =============================== */
   if (loading) return <div style={{ padding: 40 }}>로딩 중...</div>;
   if (!detail) return <div style={{ padding: 40 }}>데이터 없음</div>;
@@ -180,56 +207,38 @@ export default function CryptoDetail() {
     detail.nameKrFull ||
     detail.nameKr ||
     market.replace("KRW-", "");
-
-  const isUp = detail.change > 0;
-  const isDown = detail.change < 0;
-
   return (
-    <div style={{ padding: "40px", maxWidth: 1100, margin: "0 auto" }}>
-      <h1>{title}</h1>
-      <p style={{ color: "#6b7280", marginTop: 6 }}>
-        가상자산 · 최근 조회 기준
-      </p>
-
-      <div style={{ margin: "14px 0 18px", fontSize: 22 }}>
-        현재가: <strong>{Number(detail.price).toLocaleString()} 원</strong>
-
-        <span
-          style={{
-            marginLeft: 12,
-            color: isUp ? "#16a34a" : isDown ? "#dc2626" : "#9ca3af"
-          }}
-        >
-          {isUp && "▲ "}
-          {isDown && "▼ "}
-          {detail.change >= 0 ? "+" : ""}
-          {Math.abs(detail.change).toLocaleString()} (
-          {detail.rate >= 0 ? "+" : ""}
-          {Number(detail.rate).toFixed(2)}%)
-        </span>
-      </div>
-
+    <div className="stock-container">
       <AssetActions
-        fetchChart={fetchChartByRange}
-        chartColor="#ff8a00"
+        name={title}
+        symbol={market.replace("KRW-", "")}
+        marketLabel="가상자산"
+
         price={detail.price}
-        prevPrice={detail.prevPrice}
         change={detail.change}
         rate={detail.rate}
+        prevPrice={prevPrice}
+
+        fetchChart={fetchChartByRange}
+        chartColor="#ff8a00"
+        market="CRYPTO"
+        defaultRange="1d"
+
         open={detail.open}
         high={detail.high}
         low={detail.low}
         volume={detail.volume}
         high52={detail.high52}
         low52={detail.low52}
+
         added={added}
         disabled={false}
         onAddWatch={addToWatchlist}
         onAddPortfolio={addToPortfolio}
-        defaultRange="1d"
       />
 
-      {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
+      {error && <p className="stock-error">{error}</p>}
     </div>
   );
+
 }

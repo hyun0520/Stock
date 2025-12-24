@@ -285,6 +285,136 @@
   pointer-events: none;
 }
 
+/*chart upon name */
+/* =========================
+   Asset Header (Unified)
+========================= */
+
+.asset-header {
+    margin-left: -16px;
+    margin-right: -1px;
+    padding-left: 30px;
+    padding-right: 16px;
+    padding-top: 10px;
+    padding-bottom: 30px;
+  }
+
+/* 🔥 핵심: 폰트 강제 통일 */
+.asset-header,
+.asset-header * {
+  font-family: "Pretendard", -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 제목 */
+.asset-title {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  margin: 0;
+}
+
+.asset-title span {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* 서브 */
+.asset-sub {
+  margin-top: 6px;
+  font-size: 17px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+/* 가격 라인 */
+.asset-price-row {
+  margin-top: 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.asset-price-row .price {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.asset-price-row .change {
+  font-size: 24px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.asset-price-row .change.up {
+  color: #ef4444;
+}
+
+.asset-price-row .change.down {
+  color: #3b82f6;
+}
+
+/* =========================
+   Mobile
+========================= */
+@media (max-width: 768px) {
+  .asset-title {
+    font-size: 22px;
+    margin-top: 0.1px;
+  }
+
+  .asset-price-row {
+    gap: 10px;
+  }
+
+  .asset-price-row .price {
+    font-size: 24px;
+  }
+
+  .asset-price-row .change {
+    font-size: 17px;
+  }
+
+}
+/* =========================
+   📱 Mobile – Long Price Wrap
+========================= */
+@media (max-width: 768px) {
+  .asset-price-row {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 9px 0;
+  }
+
+  .asset-price-row .change {
+    width: 100%;
+    font-size: 16px;
+  }
+}
+/* =========================
+   📱 Mobile Header Final Fix
+========================= */
+@media (max-width: 768px) {
+  .asset-header {
+    margin-left: -16px;
+    margin-right: -16px;
+    padding-left: 4px;
+    padding-right: 16px;
+    padding-top: 0.1px;
+    padding-bottom: 15px;
+  }
+  .asset-title,
+  .asset-price-row {
+    text-align: left;
+  }
+
+  .asset-sub {
+    font-size: 15px;
+  }
+}
+
 /* ===============================
    📱 Mobile Optimization
 ================================ */
