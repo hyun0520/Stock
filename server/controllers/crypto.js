@@ -6,7 +6,7 @@ import {
   getCryptoDetail
 } from "../services/crypto.js";
 
-/* ⚡ 현재가 */
+/* 현재가 */
 export const fetchCryptoPrice = async (req, res) => {
   try {
     const { market } = req.params;
@@ -17,7 +17,7 @@ export const fetchCryptoPrice = async (req, res) => {
   }
 };
 
-/* 📊 마켓 목록 */
+/* 마켓 목록 */
 export const getCryptoMarkets = async (req, res) => {
   try {
     const response = await axios.get(
@@ -34,7 +34,7 @@ export const getCryptoMarkets = async (req, res) => {
   }
 };
 
-/* 📈 기간별 캔들 */
+/* 기간별 캔들 */
 export const fetchCryptoCandles = async (req, res) => {
   try {
     const { market } = req.params;
@@ -47,7 +47,7 @@ export const fetchCryptoCandles = async (req, res) => {
   }
 };
 
-/* 🧠 코인 상세 */
+/* 코인 상세 */
 export const fetchCryptoDetail = async (req, res) => {
   try {
     const { market } = req.params;

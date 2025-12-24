@@ -5,7 +5,7 @@ const yahooFinance = new YahooFinance();
 const BASE = "https://query1.finance.yahoo.com";
 
 /* ===============================
-   🇺🇸 미국주식 상세 정보
+  미국주식 상세 정보
 =============================== */
 export async function getStockDetail(symbol) {
   try {
@@ -52,7 +52,7 @@ export async function getStockDetail(symbol) {
       low52: meta.fiftyTwoWeekLow ?? null
     };
   } catch (err) {
-    console.error("❌ US STOCK DETAIL FAILED:", err.message);
+    console.error("US STOCK DETAIL FAILED:", err.message);
     return null;
   }
 }
@@ -105,7 +105,7 @@ function getRangeWindow(range) {
 }
 
 /* ===============================
-   🇺🇸 미국 주식 차트 (v3+ 호환)
+  미국 주식 차트 (v3+ 호환)
 =============================== */
 export async function getStockChart(symbol, range = "1m") {
   const { period1, period2, interval } = getRangeWindow(range);
@@ -133,7 +133,7 @@ export async function getStockChart(symbol, range = "1m") {
     // 혹시 다른 구조면 fallback: query1 직접 호출로 대체 가능
     return [];
   } catch (e) {
-    console.error("❌ US chart error:", symbol, e.message);
+    console.error("US chart error:", symbol, e.message);
     return [];
   }
 }

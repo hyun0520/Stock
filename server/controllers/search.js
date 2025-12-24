@@ -3,7 +3,7 @@ import axios from "axios";
 import { searchKoreaStock } from "../services/koreaStock.js";
 
 /**
- * 🔍 통합 검색 (CRYPTO + KR + US)
+ * 통합 검색 (CRYPTO + KR + US)
  * GET /api/search?query=
  */
 export const getSearchItems = async (req, res) => {
@@ -15,8 +15,7 @@ export const getSearchItems = async (req, res) => {
     let results = [];
 
     /* =========================
-       🪙 가상화폐 (Upbit)
-       - 기존 로직 유지 ✅
+      가상화폐 (Upbit)
     ========================= */
     const { data: cryptoData } = await axios.get(
       "https://api.upbit.com/v1/market/all"
@@ -38,8 +37,7 @@ export const getSearchItems = async (req, res) => {
     results.push(...cryptoResults);
 
     /* =========================
-       🇰🇷 국내주식 (CSV)
-       - 기존 로직 유지 ✅
+      국내주식 (CSV)
     ========================= */
     const krStocks = await searchKoreaStock(q);
 
@@ -52,8 +50,7 @@ export const getSearchItems = async (req, res) => {
     results.push(...krResults);
 
     /* =========================
-       🇺🇸 미국주식 (Yahoo Finance 검색 API)
-       - 새로 추가 ✅
+      미국주식 (Yahoo Finance 검색 API)
     ========================= */
     // 영어 검색일 때만
     if (/^[A-Z.]{1,10}$/.test(keyword)) {
@@ -107,17 +104,13 @@ export const getSearchItems = async (req, res) => {
 };
 
 /**
- * 💰 검색 결과 가격
+ * 검색 결과 가격
  * GET /api/search/price?type=KR&symbol=005930
  */
 export const getSearchPrices = async (req, res) => {
   const { type, symbol } = req.query;
 
   try {
-    /* =========================
-       🪙 가상화폐 (Upbit)
-       - 기존 로직 유지 ✅
-    ========================= */
     if (type === "CRYPTO") {
       const { data } = await axios.get(
         "https://api.upbit.com/v1/ticker",
@@ -129,11 +122,6 @@ export const getSearchPrices = async (req, res) => {
         changeRate: data[0].signed_change_rate * 100
       });
     }
-
-    /* =========================
-       🇰🇷 국내주식
-       - 기존 로직 유지 ✅
-    ========================= */
     if (type === "KR") {
       const { data } = await axios.get(
         `http://localhost:5000/api/stock/korea/${symbol}`
@@ -145,53 +133,50 @@ export const getSearchPrices = async (req, res) => {
       });
     }
 
-  /* =========================
-    🇺🇸 미국주식 (Yahoo 차트 API)
-    - 검색 결과 등락률 표시용
-  ========================= */
-  if (type === "US") {
-    const { data } = await axios.get(
-      `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`,
-      {
-        params: {
-          range: "2d",      // 🔥 2일 (등락 계산용)
-          interval: "1d"
-        },
-        headers: {
-          "User-Agent": "Mozilla/5.0",
-          Referer: "https://finance.yahoo.com"
+    if (type === "US") {
+      const { data } = await axios.get(
+        `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`,
+        {
+          params: {
+            range: "2d",      // 🔥 2일 (등락 계산용)
+            interval: "1d"
+          },
+          headers: {
+            "User-Agent": "Mozilla/5.0",
+            Referer: "https://finance.yahoo.com"
+          }
         }
+      );
+
+      const result = data?.chart?.result?.[0];
+      if (!result) return res.json(null);
+
+      const quote = result.indicators.quote[0];
+      const closes = quote.close.filter(Boolean);
+
+      if (closes.length < 2) {
+        return res.json({
+          price: closes.at(-1) ?? 0,
+          changeRate: 0
+        });
       }
-    );
 
-    const result = data?.chart?.result?.[0];
-    if (!result) return res.json(null);
+      const today = closes.at(-1);
+      const prev = closes.at(-2);
 
-    const quote = result.indicators.quote[0];
-    const closes = quote.close.filter(Boolean);
-
-    if (closes.length < 2) {
       return res.json({
-        price: closes.at(-1) ?? 0,
-        changeRate: 0
+        price: Number(today.toFixed(2)),
+        changeRate: Number(
+          (((today - prev) / prev) * 100).toFixed(2)
+        )
       });
     }
 
-    const today = closes.at(-1);
-    const prev = closes.at(-2);
 
-    return res.json({
-      price: Number(today.toFixed(2)),
-      changeRate: Number(
-        (((today - prev) / prev) * 100).toFixed(2)
-      )
-    });
-  }
-
-
-    res.status(400).json({ message: "Invalid type" });
-  } catch (err) {
-    console.error("Price fetch failed", err);
-    res.status(500).json({ message: "Price fetch failed" });
-  }
+      res.status(400).json({ message: "Invalid type" });
+    } catch (err) {
+      console.error("Price fetch failed", err);
+      res.status(500).json({ message: "Price fetch failed" });
+    }
 };
+

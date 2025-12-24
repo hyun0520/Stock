@@ -7,7 +7,7 @@ import { getKoreaStockChart } from "../services/yahooKoreaStockChart.js";
 
 
 /* ===============================
-   🔍 국내주식 검색
+  국내주식 검색
 ================================ */
 export async function searchStock(req, res) {
   const { q } = req.query;
@@ -22,7 +22,7 @@ export async function searchStock(req, res) {
 }
 
 /* ===============================
-   📌 국내주식 상세
+  국내주식 상세
 ================================ */
 export async function getStockDetail(req, res) {
   const { symbol } = req.params;
@@ -37,7 +37,7 @@ export async function getStockDetail(req, res) {
 }
 
 /* ===============================
-   📈 국내주식 차트 (Yahoo Finance)
+  국내주식 차트 (Yahoo Finance)
 ================================ */
 export async function getKoreaStockChartController(req, res) {
   try {

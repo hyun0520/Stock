@@ -6,13 +6,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /**
- * 📈 KRX 일봉 CSV 로드
+ *   KRX 일봉 CSV 로드
  * - 종목별 CSV 파일 읽기
- * - 최근 N년치(time, price) 반환
- *
- * CSV 형식:
- * date,close
- * 2019-09-02,2450
  */
 export function loadKrxDaily(symbol, years = 5) {
   const filePath = path.resolve(

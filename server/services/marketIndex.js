@@ -1,4 +1,3 @@
-// server/services/marketIndex.js
 import axios from "axios";
 
 const YAHOO = "https://query1.finance.yahoo.com/v8/finance/chart";

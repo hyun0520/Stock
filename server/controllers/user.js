@@ -7,24 +7,24 @@ export const register = async (req, res) => {
   try {
     const { username, email, password, birthDate } = req.body;
 
-    // ✅ 필수값 검사
+    // 필수값 검사
     if (!username || !email || !password || !birthDate) {
       return res.status(400).json({ message: "모든 필드는 필수입니다." });
     }
 
-    // ✅ 이메일 형식 검사 (@ 포함)
+    // 이메일 형식 검사 (@ 포함)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ message: "잘못된 이메일 형식 입니다." });
     }
 
-    // ✅ 아이디(username) 중복 검사
+    // 아이디(username) 중복 검사
     const usernameExists = await User.findOne({ username });
     if (usernameExists) {
       return res.status(400).json({ message: "중복된 아이디 입니다." });
     }
 
-    // ✅ 이메일 중복 검사
+    // 이메일 중복 검사
     const emailExists = await User.findOne({ email });
     if (emailExists) {
       return res.status(400).json({ message: "이미 사용중인 이메일입니다." });

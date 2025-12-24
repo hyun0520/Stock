@@ -4,12 +4,12 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 
 // ===============================
-// 🔥 ENV
+// ENV
 // ===============================
 dotenv.config(); // Render / Local 공용
 
 // ===============================
-// 🔥 Routes
+// Routes
 // ===============================
 import stockRoutes from "./routes/stock.js";
 import watchlistRoutes from "./routes/watchlist.js";
@@ -22,33 +22,33 @@ import fxRoutes from "./routes/fx.js";
 import userRoutes from "./routes/user.js";
 
 // ===============================
-// 🔥 App
+// App
 // ===============================
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ===============================
-// 🔥 Middleware (⚠️ 순서 중요)
+// Middleware
 // ===============================
-app.use(cors());              // ⭐ 기본 CORS (문제 최소화)
-app.use(express.json());      // ⭐ body parser
+app.use(cors());              
+app.use(express.json());     
 
 // ===============================
-// 🔥 MongoDB
+// MongoDB
 // ===============================
 console.log("🔍 MONGO_URI:", process.env.MONGO_URI);
 
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("🔥 MongoDB Connected");
+    console.log("MongoDB Connected");
   })
   .catch((err) => {
-    console.error("❌ MongoDB Connection Error:", err);
+    console.error("MongoDB Connection Error:", err);
   });
 
 // ===============================
-// 🔥 API Routes
+// API Routes
 // ===============================
 app.use("/api/auth", userRoutes);
 app.use("/api/user", userRoutes);
@@ -62,14 +62,14 @@ app.use("/api/market", marketRouter);
 app.use("/api/fx", fxRoutes);
 
 // ===============================
-// 🔥 Health Check
+// Health Check
 // ===============================
 app.get("/", (req, res) => {
   res.send("Server Running");
 });
 
 // ===============================
-// 🔥 Start Server
+// Start Server
 // ===============================
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

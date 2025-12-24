@@ -8,13 +8,13 @@ import { fileURLToPath } from "url";
 const router = express.Router();
 
 /* ===============================
-   📁 __dirname (ESM 대응)
+   dirname (ESM 대응)
 ================================ */
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 /* ===============================
-   📈 INDEX (Yahoo Finance)
+   INDEX (Yahoo Finance)
 ================================ */
 router.get("/index/:market", async (req, res) => {
   try {
@@ -28,7 +28,7 @@ router.get("/index/:market", async (req, res) => {
     const symbol = map[req.params.market];
     if (!symbol) return res.json(null);
 
-    // 🔹 2일치 일봉 (전일 대비 계산용)
+    // 2일치 일봉 (전일 대비 계산용)
     const dailyUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=2d&interval=1d`;
     const dailyRes = await axios.get(dailyUrl, {
       headers: { "User-Agent": "Mozilla/5.0" }
@@ -44,7 +44,7 @@ router.get("/index/:market", async (req, res) => {
     const diff = current - prevClose;
     const rate = (diff / prevClose) * 100;
 
-    // 🔹 장중 차트 (기존 그대로)
+    // 장중 차트 (기존 그대로)
     const intradayUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?range=1d&interval=5m`;
     const intradayRes = await axios.get(intradayUrl, {
       headers: { "User-Agent": "Mozilla/5.0" }
@@ -53,7 +53,7 @@ router.get("/index/:market", async (req, res) => {
     const result = intradayRes.data.chart.result?.[0];
     const chart = result.timestamp
       .map((t, i) => ({
-        time: t * 1000, // 🔥 문자열 말고 timestamp 유지
+        time: t * 1000, // 문자열 말고 timestamp 유지
         value: result.indicators.quote[0].close[i]
       }))
       .filter(d => d.value != null);
@@ -71,7 +71,7 @@ router.get("/index/:market", async (req, res) => {
 });
 
 /* ===============================
-   🇰🇷 KRX CSV 로드 (EUC-KR)
+  KRX CSV 로드 (EUC-KR)
 ================================ */
 function loadKoreaStocks(limit = 120) {
   const csvPath = path.join(__dirname, "../data/korea_stocks.csv");
@@ -110,7 +110,7 @@ function loadKoreaStocks(limit = 120) {
 }
 
 /* ===============================
-   🇰🇷 등락률 계산
+  등락률 계산
 ================================ */
 async function calculateRates({ direction = "up", limit = 5 }) {
   const stocks = loadKoreaStocks();
@@ -158,7 +158,7 @@ async function calculateRates({ direction = "up", limit = 5 }) {
 }
 
 /* ===============================
-   📈 상승 TOP
+  상승 TOP
 ================================ */
 router.get("/korea/top-gainers", async (req, res) => {
   const data = await calculateRates({ direction: "up" });
@@ -166,7 +166,7 @@ router.get("/korea/top-gainers", async (req, res) => {
 });
 
 /* ===============================
-   📉 하락 TOP
+  하락 TOP
 ================================ */
 router.get("/korea/top-losers", async (req, res) => {
   const data = await calculateRates({ direction: "down" });

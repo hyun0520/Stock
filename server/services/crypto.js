@@ -19,7 +19,7 @@ export async function getCryptoPrice(market) {
   };
 }
 
-/* 📈 기간별 캔들 */
+/* 기간별 캔들 */
 export async function getCryptoCandlesByRange(market, range = "1m") {
   const map = {
     "1d": { url: "minutes/10", count: 144 },
@@ -40,9 +40,9 @@ export async function getCryptoCandlesByRange(market, range = "1m") {
   return data;
 }
 
-/* 🧠 코인 상세 (한글명 포함) */
+/* 코인 상세 (한글명 포함) */
 export async function getCryptoDetail(market) {
-  // ✅ 같은 파일이므로 import 없이 바로 호출
+  // 같은 파일이므로 import 없이 바로 호출
   const priceData = await getCryptoPrice(market);
 
   // 마켓 이름 (한글)

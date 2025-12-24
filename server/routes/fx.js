@@ -4,7 +4,7 @@ import axios from "axios";
 const router = express.Router();
 
 /* ===============================
-   📌 ECB 영업일 계산
+  ECB 영업일 계산
 =============================== */
 const getLastBusinessDay = (date) => {
   const d = new Date(date);
@@ -16,7 +16,6 @@ const getLastBusinessDay = (date) => {
 
 router.get("/", async (req, res) => {
   try {
-    // 🔥 핵심 수정 포인트
     const latestDay = getLastBusinessDay(new Date());
     const prevDay = getLastBusinessDay(latestDay);
 

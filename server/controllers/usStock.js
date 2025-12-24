@@ -5,7 +5,7 @@ import {
 } from "../services/statesStock.js";
 
 /**
- * 📄 미국주식 상세
+ * 미국주식 상세
  * GET /api/usStock/:symbol
  */
 export async function detail(req, res) {
@@ -25,7 +25,7 @@ export async function detail(req, res) {
 }
 
 /**
- * 📈 미국주식 차트
+ * 미국주식 차트
  * GET /api/usStock/:symbol/chart
  */
 export async function chart(req, res) {

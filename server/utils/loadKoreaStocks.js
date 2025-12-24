@@ -10,7 +10,7 @@ const __dirname = path.dirname(__filename);
 let cache = null;
 
 /**
- * 📂 국내 주식 CSV 로드 (1회 로딩 + 캐싱)
+ *  국내 주식 CSV 로드 (1회 로딩 + 캐싱)
  * - cp949 → utf-8 변환
  * - 종목코드 6자리 보정 (padStart)
  */
@@ -18,10 +18,10 @@ export function loadKoreaStocks() {
   if (cache) return cache;
 
   const filePath = path.resolve(__dirname, "../data/korea_stocks.csv");
-  console.log("📂 CSV PATH:", filePath);
+  console.log("CSV PATH:", filePath);
 
   if (!fs.existsSync(filePath)) {
-    console.error("❌ CSV FILE NOT FOUND");
+    console.error("CSV FILE NOT FOUND");
     return [];
   }
 
@@ -45,7 +45,7 @@ export function loadKoreaStocks() {
       const rawSymbol = String(cols[1] || "").trim();
 
       return {
-        symbol: rawSymbol.padStart(6, "0"), // 🔑 핵심: 6자리 보정
+        symbol: rawSymbol.padStart(6, "0"), //6자리 보정
         name: String(cols[2] || "").trim(),
         market: String(cols[6] || "").trim() // KOSPI / KOSDAQ
       };
