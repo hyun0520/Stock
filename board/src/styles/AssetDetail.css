@@ -273,7 +273,7 @@
 }
 
 /* ===============================
-   📏 Prev Price Box
+   Prev Price Box
 ================================ */
 .chart-prev-box {
   background: #f3f4f6;
@@ -285,10 +285,10 @@
   pointer-events: none;
 }
 
-/*chart upon name */
-/* =========================
+
+/* =======================
    Asset Header (Unified)
-========================= */
+   ====================== */
 
 .asset-header {
     margin-left: -16px;
@@ -299,7 +299,6 @@
     padding-bottom: 30px;
   }
 
-/* 🔥 핵심: 폰트 강제 통일 */
 .asset-header,
 .asset-header * {
   font-family: "Pretendard", -apple-system, BlinkMacSystemFont,
@@ -378,9 +377,7 @@
   }
 
 }
-/* =========================
-   📱 Mobile – Long Price Wrap
-========================= */
+
 @media (max-width: 768px) {
   .asset-price-row {
     flex-wrap: wrap;
@@ -393,9 +390,7 @@
     font-size: 16px;
   }
 }
-/* =========================
-   📱 Mobile Header Final Fix
-========================= */
+
 @media (max-width: 768px) {
   .asset-header {
     margin-left: -16px;
@@ -415,9 +410,6 @@
   }
 }
 
-/* ===============================
-   📱 Mobile Optimization
-================================ */
 @media (max-width: 768px) {
   .asset-chart {
     margin-left: -26px;
@@ -432,8 +424,6 @@
 }
 
 @media (max-width: 768px) {
-
-  /* 전일대비(up/down)는 색상 유지 + 조금 더 유연 */
   .summary-row .up,
   .summary-row .down {
     font-size: clamp(11px, 3.4vw, 14px);
@@ -457,13 +447,12 @@
 
   .range-tabs {
     display: flex;
-    justify-content: center;     /* 👈 가운데 정렬 핵심 */
-    gap: 6px;
+    justify-content: center;   
     overflow-x: auto;
     padding-bottom: 6px;
   }
   .range-tabs::-webkit-scrollbar {
-    display: none; /* 모바일에서 스크롤바 숨김 */
+    display: none; 
   }
   .range-tabs button {  
     padding: 8px 10px;

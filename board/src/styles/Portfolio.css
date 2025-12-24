@@ -118,8 +118,8 @@
 .summary-item {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;   /* 🔥 왼쪽 기준 통일 */
-  gap: 10px;                 /* 라벨 ↔ 금액 간격 */
+  align-items: flex-start;  
+  gap: 10px;                
 }
 
 .summary-item .label {
@@ -144,10 +144,10 @@
   font-weight: 800;
 }
 .profit-amount {
-  display: inline-flex;      /* 🔥 */
+  display: inline-flex;      
   align-items: center;
-  gap: 6px;                  /* 금액 ↔ 퍼센트 간격 */
-  white-space: nowrap;       /* 🔥 줄바꿈 방지 */
+  gap: 6px;                  
+  white-space: nowrap;       
 }
 .profit-plus {
   color: #16a34a;
@@ -315,12 +315,10 @@
 ================================ */
 
 @media (max-width: 768px) {
-
-  /* 🔥 종목명 + 수량을 한 줄로 */
   .mobile-card .mobile-left {
     display: flex;
     align-items: center;
-    gap: 8px;              /* 이름 ↔ 수량 간격 */
+    gap: 8px;             
   }
 
   .mobile-card .mobile-left .name {
@@ -341,9 +339,9 @@
   /* 🔥 가격 + 손익을 같은 줄로 */
   .mobile-card .mobile-right {
     display: flex;
-    flex-direction: row;        /* ← 핵심 */
+    flex-direction: row;        
     align-items: center;
-    gap: 10px;                  /* 가격 ↔ 손익 간격 */
+    gap: 10px;                  
   }
 
     .mobile-right {
@@ -359,12 +357,12 @@
   /* 배경 오버레이 */
   .detail-overlay {
     position: fixed;
-    inset: 0;                      /* top, right, bottom, left = 0 */
+    inset: 0;                      
     background: rgba(0, 0, 0, 0.55);
     z-index: 9999;
 
     display: flex;
-    align-items: flex-end;         /* 🔥 아래에서 올라오는 느낌 */
+    align-items: flex-end;         
     justify-content: center;
   }
 

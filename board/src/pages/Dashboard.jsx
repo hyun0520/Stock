@@ -356,7 +356,6 @@ function MarketChart({ title, data }) {
               );
             }}
           />
-
           <Line
             dataKey="value"
             dot={false}

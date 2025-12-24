@@ -1,6 +1,6 @@
 import { api } from "./api";
 
-/* 🔥 market index */
+/* market index */
 export const getKOSPI = async () =>
   (await api.get("/market/index/kospi")).data;
 
@@ -13,6 +13,6 @@ export const getNASDAQ = async () =>
 export const getSP500 = async () =>
   (await api.get("/market/index/sp500")).data;
 
-/* 🔥 환율 */
+/* 환율 */
 export const getFX = async () =>
   (await api.get("/fx")).data;

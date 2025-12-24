@@ -227,7 +227,7 @@
 
 /* 제목 */
 .stock-title {
-  font-size: 32px; /* h1 기본 느낌 유지 */
+  font-size: 32px; 
   font-weight: 700;
   margin: 0;
 }

@@ -536,11 +536,11 @@
 
   /* 섹션 순서 지정 */
   .asset-section {
-    order: 1; /* 🔥 내 자산 먼저 */
+    order: 1;
   }
 
   .market-section {
-    order: 2; /* 시장 지수는 아래 */
+    order: 2; 
   }
 
   .fx-section {
@@ -557,7 +557,7 @@
   }
 
   .asset-right {
-    display: none; /* 이미 요청한 부분 */
+    display: none;
   }
 }
 

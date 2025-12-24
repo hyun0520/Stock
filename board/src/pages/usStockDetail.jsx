@@ -12,11 +12,11 @@ export default function StockDetailUS() {
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
 
-  // 💱 환율 (USD → KRW)
-  const [usdRate, setUsdRate] = useState(1350);
+  // 환율 (USD → KRW)
+  const [usdRate, setUsdRate] = useState(1470);
 
   /* ===============================
-     💱 환율 로드 (공통 API)
+    환율 로드 (공통 API)
   =============================== */
   useEffect(() => {
     const fetchFx = async () => {
@@ -47,7 +47,7 @@ export default function StockDetailUS() {
         if (!mounted) return;
         setDetail(res.data || null);
       } catch (err) {
-        console.error("❌ US stock detail error", err);
+        console.error("US stock detail error", err);
         setError("미국 주식 정보를 불러오지 못했습니다.");
       } finally {
         if (mounted) setLoading(false);
@@ -61,7 +61,7 @@ export default function StockDetailUS() {
   }, [symbol]);
 
   /* ===============================
-     ⭐ 관심종목 체크
+     관심종목 체크
   =============================== */
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -87,7 +87,7 @@ export default function StockDetailUS() {
   }, [symbol]);
 
   /* ===============================
-     📈 차트 fetch (AssetActions)
+    차트 fetch (AssetActions)
   =============================== */
   const fetchChartByRange = useCallback(
     async (range) => {
@@ -106,7 +106,7 @@ export default function StockDetailUS() {
   );
 
   /* ===============================
-     계산값
+    계산값
   =============================== */
   const price =
     typeof detail?.price === "number" && detail.price > 0
@@ -127,7 +127,7 @@ export default function StockDetailUS() {
   const isDown = diff < 0;
 
   /* ===============================
-     관심종목 추가
+    관심종목 추가
   =============================== */
   const addToWatchlist = async () => {
     try {
@@ -205,24 +205,20 @@ export default function StockDetailUS() {
         name={detail.name}
         symbol={detail.symbol}
         marketLabel="미국주식"
-
         price={price}
         change={diff}
         rate={rate}
         prevPrice={detail.prevPrice}
-
         fetchChart={fetchChartByRange}
         chartColor="#ff8a00"
         market="US"
         defaultRange="1d"
-
         open={detail.open}
         high={detail.high}
         low={detail.low}
         volume={detail.volume}
         high52={detail.high52}
         low52={detail.low52}
-
         added={added}
         disabled={price <= 0}
         onAddWatch={addToWatchlist}

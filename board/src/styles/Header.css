@@ -82,7 +82,7 @@
   gap: 12px;
 }
 
-/* 🔍 Icon Button */
+/* Icon Button */
 .icon-btn {
   width: 44px;
   height: 44px;
@@ -411,7 +411,7 @@
 @media (max-width: 768px) {
   .mobile-actions {
     display: flex;
-    flex-direction: row !important;  /* 🔥 핵심 */
+    flex-direction: row !important;  
     align-items: center;
     margin-left: auto;
     gap: 10px;

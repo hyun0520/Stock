@@ -9,7 +9,7 @@ export const api = axios.create({
   withCredentials: false,
 });
 
-// 🔐 JWT 자동 첨부
+// JWT 자동 첨부
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");

@@ -213,24 +213,20 @@ export default function CryptoDetail() {
         name={title}
         symbol={market.replace("KRW-", "")}
         marketLabel="가상자산"
-
         price={detail.price}
         change={detail.change}
         rate={detail.rate}
         prevPrice={prevPrice}
-
         fetchChart={fetchChartByRange}
         chartColor="#ff8a00"
         market="CRYPTO"
         defaultRange="1d"
-
         open={detail.open}
         high={detail.high}
         low={detail.low}
         volume={detail.volume}
         high52={detail.high52}
         low52={detail.low52}
-
         added={added}
         disabled={false}
         onAddWatch={addToWatchlist}

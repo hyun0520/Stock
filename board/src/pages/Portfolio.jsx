@@ -53,8 +53,7 @@ export default function Portfolio() {
   }, [token]);
 
   /* ===============================
-     🔥 현재가 불러오기 (주식 + 코인, 3초 폴링)
-     - US: USD → KRW
+     현재가 불러오기
   =============================== */
   useEffect(() => {
     if (!list.length) return;
@@ -105,7 +104,6 @@ export default function Portfolio() {
 
   /* ===============================
      수정 시작
-     - US: 원화 → 달러로 변환해서 input에 표시
   =============================== */
   const startEdit = (item) => {
     setEditId(item._id);
@@ -120,7 +118,6 @@ export default function Portfolio() {
 
   /* ===============================
      수정 저장
-     - US: 달러 → 원화로 변환 후 저장
   =============================== */
   const saveEdit = async (id) => {
     const item = list.find((i) => i._id === id);
@@ -293,7 +290,7 @@ export default function Portfolio() {
               </div>
               
             {/* ===============================
-                🖥 PC 전용 (기존 UI 유지)
+                PC 전용 (기존 UI 유지)
             =============================== */}
             <div className="pc-only">
               <div className="left">
@@ -374,7 +371,7 @@ export default function Portfolio() {
                 className="detail-close"
                 onClick={() => setSelectedItem(null)}
               >
-                ×
+                x
               </button>
 
               <h2>잔고내역 상세</h2>

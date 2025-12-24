@@ -40,7 +40,7 @@ export default function StockDetail() {
 
         setChart1y(data);
       } catch (err) {
-        console.error("❌ 52주 차트 로드 실패", err);
+        console.error("52주 차트 로드 실패", err);
         setChart1y([]);
       }
     }
