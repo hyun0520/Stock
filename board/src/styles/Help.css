@@ -1,0 +1,180 @@
+.help-page {
+  background: #000;
+  color: #fff;
+}
+
+/* HERO */
+.help-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10%;
+}
+
+.help-hero h1 {
+  font-size: 64px;
+  line-height: 1.1;
+}
+
+.help-hero h1 span {
+  color: orange;
+}
+
+.help-hero p {
+  margin-top: 24px;
+  font-size: 18px;
+  color: #b5b5b5;
+}
+
+/* SECTION 공통 */
+.help-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10%;
+  gap: 80px;
+}
+
+.help-section.reverse {
+  flex-direction: row-reverse;
+}
+
+.help-section .icon {
+  display: inline-block;
+  background: #10b981;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.help-section h2 {
+  font-size: 42px;
+  margin-bottom: 16px;
+}
+
+.help-section p {
+  font-size: 18px;
+  color: #b5b5b5;
+}
+
+.help-section {
+    color: orange;
+}
+/* ===============================
+   📱 Phone Mockup
+================================ */
+.phone-frame {
+  position: relative;
+  width: 320px;
+  height: 650px;
+  background: #000;
+  border-radius: 40px;
+  padding: 14px;
+  box-shadow:
+    0 40px 80px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 2px #1f2933;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.phone-notch {
+  position: absolute;
+  top: 8px;
+  width: 120px;
+  height: 22px;
+  background: #000;
+  border-radius: 0 0 14px 14px;
+  z-index: 10;
+}
+
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+  object-fit: cover;
+  background: #fff;
+}
+
+.phone-frame {
+  margin-top: -40px;
+}
+
+/* ===============================
+   📱 Mobile (≤ 768px)
+================================ */
+@media (max-width: 768px) {
+/* ================= HERO ================= */
+  .help-hero {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 100px 6% 80px;
+    text-align: center;
+    gap: 80px;
+  }
+
+  .help-hero .text {
+    max-width: 100%;
+  }
+
+  .help-hero h1 {
+    font-size: 43px;
+    line-height: 1.2;
+  }
+
+  .help-hero h1 span {
+    display: block;
+  }
+
+  .help-hero p {
+    font-size: 14px;
+    margin-top: 16px;
+  }
+
+  .help-hero .image {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .help-hero .phone-frame {
+    width: 240px;
+    height: 480px;
+  }
+
+/* ================= SECTIONS ================= */
+  .help-section {
+    flex-direction: column;
+    padding: 150px 9%;
+    text-align: center;
+    gap: 32px;
+  }
+
+  .help-section.reverse {
+    flex-direction: column;
+  }
+
+  .help-section .text {
+    order: 1;
+  }
+
+  .help-section .image {
+    order: 2;
+  }
+
+  .help-section h2 {
+    font-size: 28px;
+  }
+
+  .help-section p {
+    font-size: 14px;
+  }
+
+  .help-section .phone-frame {
+    width: 240px;
+    height: 480px;
+  }
+}

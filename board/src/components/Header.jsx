@@ -347,7 +347,9 @@ export default function Header({ setIsAuth, isAuth }) {
           <span onClick={() => handleAuthNavigate("/portfolio")}>
             포트폴리오
           </span>
-          <span>도움말</span>
+          <span onClick={() => handleAuthNavigate("/help")}>
+            도움말
+          </span>
         </nav>
 
         <div className="header-right desktop-only">
@@ -428,7 +430,7 @@ export default function Header({ setIsAuth, isAuth }) {
           <span onClick={() => handleMenuNavigate("/dashboard")}>대시보드</span>
           <span onClick={() => handleMenuNavigate("/watchlist")}>관심종목</span>
           <span onClick={() => handleMenuNavigate("/portfolio")}>포트폴리오</span>
-          <span onClick={() => handleMenuNavigate("/dashboard")}>도움말</span>
+          <span onClick={() => handleMenuNavigate("/help")}>도움말</span>
           <span onClick={() => handleMenuNavigate("/profile")}>내 정보</span>
 
           <hr />
