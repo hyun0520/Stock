@@ -460,4 +460,152 @@
       transform: translateY(0);
     }
   }
+  /* ===============================
+    📱 모바일 상세 모달 액션 버튼
+  ================================ */
+  .detail-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  .detail-btn {
+    flex: 1;
+    padding: 14px 0;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* 수정 */
+  .detail-btn.edit {
+    background: #2563eb; /* blue */
+    color: #fff;
+  }
+
+  /* 삭제 */
+  .detail-btn.delete {
+    background: #ef4444; /* red */
+    color: #fff;
+  }
+}
+
+
+/* 수정 오버레이 */
+.edit-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 1300;
+}
+
+/* Bottom Sheet */
+.edit-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #020617;
+  border-radius: 16px 16px 0 0;
+  padding: 20px;
+  animation: slideUp 0.25s ease-out;
+}
+
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: #64748b;
+  border-radius: 2px;
+  margin: 0 auto 12px;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.edit-actions button {
+  flex: 1;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+}
+
+/* ===============================
+   모바일 수정 시트
+================================ */
+.edit-sheet {
+  margin-top: 16px;
+}
+
+/* 🔥 수량 / 매수가 2열 그리드 */
+.edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+/* 개별 필드 */
+.edit-grid .edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 라벨 */
+.edit-grid .edit-field label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #cbd5f5;
+}
+
+/* 인풋 */
+.edit-grid .edit-field input {
+  height: 46px;
+  font-size: 17px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+}
+
+/* 버튼 영역 */
+.edit-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.edit-actions .save-btn {
+  flex: 1;
+  height: 52px;
+  background: #22c55e;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  border-radius: 14px;
+}
+
+.edit-actions .cancel-btn {
+  flex: 1;
+  height: 52px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  border-radius: 14px;
 }

@@ -20,8 +20,11 @@ export default function Portfolio() {
   const [qty, setQty] = useState("");
   const [price, setPrice] = useState("");
   const [selectedItem, setSelectedItem] = useState(null);
-  // 현재가 저장 (id → price, 원화 기준)
   const [priceMap, setPriceMap] = useState({});
+  // 모바일 전용 수정 상태
+  const [mobileEdit, setMobileEdit] = useState(false);
+  const [mobileQty, setMobileQty] = useState("");
+  const [mobilePrice, setMobilePrice] = useState("");
 
   const token = localStorage.getItem("token");
 
@@ -410,6 +413,95 @@ export default function Portfolio() {
                   {profit.toLocaleString()}원 ({rate}%)
                 </span>
               </div>
+              {/* ===== 액션 버튼 ===== */}
+              <div className="detail-actions">
+                <button
+                  className="detail-btn edit"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setMobileEdit(true);
+                  setMobileQty(selectedItem.quantity);
+                  setMobilePrice(selectedItem.buyPrice);
+                }}
+                >
+                  수정
+                </button>
+
+                <button
+                  className="detail-btn delete"
+                  onClick={() => {
+                    setSelectedItem(null);
+                    handleDelete(selectedItem._id);
+                  }}
+                >
+                  삭제
+                </button>
+              </div>
+              {mobileEdit && (
+                <div className="mobile-edit-box edit-sheet">
+                  <div className="edit-grid">
+                    <div className="edit-field">
+                      <label>수량</label>
+                      <input
+                        type="number"
+                        value={mobileQty}
+                        onChange={(e) => setMobileQty(e.target.value)}
+                      />
+                    </div>
+
+                    <div className="edit-field">
+                      <label>매수가</label>
+                      <input
+                        type="number"
+                        value={mobilePrice}
+                        onChange={(e) => setMobilePrice(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="edit-actions">
+                      <button
+                        className="save-btn"
+                        onClick={async () => {
+                          await api.put(
+                            `/portfolio/${selectedItem._id}`,
+                            {
+                              quantity: Number(mobileQty),
+                              buyPrice: Number(mobilePrice)
+                            },
+                            { headers: { Authorization: `Bearer ${token}` } }
+                          );
+
+                          setList((prev) =>
+                            prev.map((i) =>
+                              i._id === selectedItem._id
+                                ? {
+                                    ...i,
+                                    quantity: Number(mobileQty),
+                                    buyPrice: Number(mobilePrice)
+                                  }
+                                : i
+                            )
+                          );
+
+                          setMobileEdit(false);
+                          setSelectedItem(null);
+                        }}
+                      >
+                        저장
+                      </button>
+                      <button
+                        className="cancel-btn"
+                        onClick={() => setMobileEdit(false)}
+                      >
+                        취소
+                      </button>
+                  </div>
+                </div>
+              )}
+
+
+
             </div>
           </div>
         );

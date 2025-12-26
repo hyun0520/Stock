@@ -13,8 +13,8 @@ export default function Footer() {
           </div>
           <div className="footer-info">
             <p>
-              체크마이에셋 | 서울특별시 강남구 테헤란로 211
-              02-0000-0000
+              체크마이에셋 | 경기도 고양시 일산동구 노루목로 79
+              02-3456-7891
             </p>
             <p>© 2025 Check My Assets Corp.</p>
           </div>

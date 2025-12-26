@@ -229,8 +229,6 @@ export default function Header({ setIsAuth, isAuth }) {
   const SearchItem = ({ item }) => {
     const price = prices[item.symbol];
     const isRecent = query === "";
-
-    //국내주식(KR)만 "보통주" 제거해서 표시
     const displayName =
       item.type === "KR"
         ? item.name.replace(/보통주/g, "").trim()
@@ -336,7 +334,6 @@ export default function Header({ setIsAuth, isAuth }) {
             onClick={() => navigate("/dashboard")}
           />
         </div>
-
         <nav className="header-menu desktop-only">
           <span onClick={() => handleAuthNavigate("/dashboard")}>
             대시보드
@@ -347,7 +344,7 @@ export default function Header({ setIsAuth, isAuth }) {
           <span onClick={() => handleAuthNavigate("/portfolio")}>
             포트폴리오
           </span>
-          <span onClick={() => handleAuthNavigate("/help")}>
+          <span onClick={() => navigate("/help")}>
             도움말
           </span>
         </nav>
