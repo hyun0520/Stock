@@ -1,10 +1,8 @@
 import {
   searchKoreaStock,
-  getKoreaStockDetail
+  getKoreaStockDetail,
+  getKoreaStockChartData
 } from "../services/koreaStock.js";
-
-import { getKoreaStockChart } from "../services/yahooKoreaStockChart.js";
-
 
 /* ===============================
   국내주식 검색
@@ -37,22 +35,18 @@ export async function getStockDetail(req, res) {
 }
 
 /* ===============================
-  국내주식 차트 (Yahoo Finance)
+  국내주식 차트 (Daum Finance)
 ================================ */
 export async function getKoreaStockChartController(req, res) {
   try {
     const { symbol } = req.params;
-    const { range = "1m", market = "KOSPI" } = req.query;
+    const { range = "1d" } = req.query;
 
-    const chart = await getKoreaStockChart({
-      symbol,
-      market,
-      range
-    });
-
+    const chart = await getKoreaStockChartData(symbol, range);
     res.json(chart);
+
   } catch (err) {
     console.error("❌ Korea chart error:", err);
-    res.status(500).json({ message: "Chart fetch failed" });
+    res.status(500).json([]);
   }
 }

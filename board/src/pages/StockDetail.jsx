@@ -1,8 +1,7 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../services/api";
 import AssetActions from "../components/AssetActions";
-import { useMemo } from "react";
 import "../styles/StockDetail.css";
 
 export default function StockDetail() {
@@ -13,41 +12,8 @@ export default function StockDetail() {
   const [added, setAdded] = useState(false);
   const [error, setError] = useState("");
   const [chart1y, setChart1y] = useState([]);
-  const format = (v) =>
-    typeof v === "number" && !isNaN(v) ? v.toLocaleString() : "—";
 
-  // 52주 계산용 차트 (KR 전용)
-  useEffect(() => {
-    let mounted = true;
-
-    async function fetch1yChart() {
-      try {
-        const res = await api.get(
-          `/stock/korea/${symbol}/chart`,
-          { params: { range: "1y" } }
-        );
-
-        if (!mounted) return;
-
-        const data = Array.isArray(res.data)
-          ? res.data.map(d => ({
-              ...d,
-              time: typeof d.time === "string"
-                ? new Date(d.time).getTime()
-                : d.time
-            }))
-          : [];
-
-        setChart1y(data);
-      } catch (err) {
-        console.error("52주 차트 로드 실패", err);
-        setChart1y([]);
-      }
-    }
-
-    fetch1yChart();
-    return () => (mounted = false);
-  }, [symbol]);
+  const loaded1yRef = useRef(false); // 🔥 1y 중복 호출 방지
 
   /* ===============================
      국내주식 상세 정보
@@ -72,9 +38,7 @@ export default function StockDetail() {
     }
 
     fetchDetail();
-    return () => {
-      mounted = false;
-    };
+    return () => (mounted = false);
   }, [symbol]);
 
   /* ===============================
@@ -86,14 +50,10 @@ export default function StockDetail() {
 
     async function checkWatchlist() {
       try {
-        const res = await api.get("/watchlist", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
+        const res = await api.get("/watchlist");
         const exists = res.data.some(
           (item) => item.symbol === symbol && item.market === "KOREA"
         );
-
         setAdded(exists);
       } catch (err) {
         console.error("watchlist check failed", err);
@@ -104,7 +64,30 @@ export default function StockDetail() {
   }, [symbol]);
 
   /* ===============================
-     차트 (range 전달)
+    차트 범위별 데이터 필터
+  =============================== */
+  // const filterByRange = (data, range) => {
+  //   if (!data.length) return data;
+
+  //   const now = Date.now();
+
+  //   const rangeMsMap = {
+  //     "1d": 1 * 24 * 60 * 60 * 1000,
+  //     "1w": 7 * 24 * 60 * 60 * 1000,
+  //     "1m": 30 * 24 * 60 * 60 * 1000,
+  //     "3m": 90 * 24 * 60 * 60 * 1000,
+  //     "1y": 365 * 24 * 60 * 60 * 1000
+  //   };
+
+  //   const limitMs = rangeMsMap[range];
+  //   if (!limitMs) return data;
+
+  //   return data.filter(d => now - d.time <= limitMs);
+  // };
+
+  
+  /* ===============================
+     차트 요청 함수 (단일 진입점)
   =============================== */
   const fetchChartByRange = useCallback(
     async (range) => {
@@ -113,16 +96,7 @@ export default function StockDetail() {
           `/stock/korea/${symbol}/chart`,
           { params: { range } }
         );
-
-        return Array.isArray(res.data)
-          ? res.data.map((d) => ({
-              ...d,
-              time:
-                typeof d.time === "string"
-                  ? new Date(d.time).getTime()
-                  : d.time
-            }))
-          : [];
+      return Array.isArray(res.data) ? res.data : [];
       } catch (err) {
         console.error("chart fetch error", err);
         return [];
@@ -130,9 +104,61 @@ export default function StockDetail() {
     },
     [symbol]
   );
+  const addToWatchlist = async () => {
+    try {
+      await api.post("/watchlist", {
+        symbol: detail.symbol,
+        name: detail.name,
+        market: "KOREA"
+      });
+
+      setAdded(true);
+    } catch (err) {
+      setError("이미 관심종목이거나 오류가 발생했습니다.");
+    }
+  };
+
+  const addToPortfolio = async (qty, buy) => {
+    if (!qty || !buy || Number(qty) <= 0 || Number(buy) <= 0) {
+      return "보유 수량과 매수가를 올바르게 입력하세요.";
+    }
+
+    try {
+      await api.post("/portfolio", {
+        symbol: detail.symbol,
+        name: detail.name,
+        market: "KOREA",
+        quantity: Number(qty),
+        buyPrice: Number(buy)
+      });
+
+      return true;
+    } catch (err) {
+      return (
+        err.response?.data?.message ||
+        "이미 등록되었거나 오류가 발생했습니다."
+      );
+    }
+  };
 
   /* ===============================
-    52주 최고 / 최저 계산
+     🔥 52주 차트 지연 로딩 (초기 호출 ❌)
+     - 페이지 안정화 후 1번만 실행
+  =============================== */
+  useEffect(() => {
+    if (loaded1yRef.current) return;
+
+    const timer = setTimeout(async () => {
+      const data = await fetchChartByRange("1y");
+      setChart1y(data);
+      loaded1yRef.current = true;
+    }, 8000); // 🔥 8초 후 (Yahoo 안전)
+
+    return () => clearTimeout(timer);
+  }, [fetchChartByRange]);
+
+  /* ===============================
+     52주 최고 / 최저
   =============================== */
   const { high52Calc, low52Calc } = useMemo(() => {
     if (!chart1y.length) {
@@ -146,73 +172,6 @@ export default function StockDetail() {
       low52Calc: Math.min(...prices)
     };
   }, [chart1y]);
-
-
-
-  /* ===============================
-     관심종목 추가
-  =============================== */
-  const addToWatchlist = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("로그인이 필요합니다.");
-        return;
-      }
-
-      await api.post(
-        "/watchlist",
-        {
-          symbol: detail.symbol,
-          name: detail.name,
-          market: "KOREA"
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-
-      setAdded(true);
-      setError("");
-    } catch {
-      setError("이미 관심종목이거나 오류가 발생했습니다.");
-    }
-  };
-
-  /* ===============================
-     포트폴리오 추가
-  =============================== */
-  const addToPortfolio = async (qty, buy) => {
-    const token = localStorage.getItem("token");
-    if (!token) return "로그인이 필요합니다.";
-
-    if (!qty || !buy || Number(qty) <= 0 || Number(buy) <= 0) {
-      return "보유 수량과 매수가를 올바르게 입력하세요.";
-    }
-
-    try {
-      await api.post(
-        "/portfolio",
-        {
-          symbol: detail.symbol,
-          name: detail.name,
-          market: "KOREA",
-          quantity: Number(qty),
-          buyPrice: Number(buy)
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-
-      return true;
-    } catch (err) {
-      return (
-        err.response?.data?.message ||
-        "이미 등록되었거나 오류가 발생했습니다."
-      );
-    }
-  };
 
   /* ===============================
      Render
@@ -244,7 +203,7 @@ export default function StockDetail() {
         rate={rate}
         prevPrice={prevPrice}
         fetchChart={fetchChartByRange}
-        defaultRange="1d"
+        defaultRange="1d"        
         chartColor="#ff8a00"
         market="KOREA"
         open={open}
@@ -255,7 +214,7 @@ export default function StockDetail() {
         low52={low52Calc}
         added={added}
         disabled={!price}
-        onAddWatch={addToWatchlist}
+        onAddWatch={addToWatchlist}        
         onAddPortfolio={addToPortfolio}
       />
       {error && <p className="stock-error">{error}</p>}

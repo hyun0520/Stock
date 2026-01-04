@@ -90,7 +90,7 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "비밀번호가 일치하지 않습니다" });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user);
 
     res.json({
       message: "Login successful",
@@ -100,12 +100,14 @@ export const login = async (req, res) => {
         username: user.username,
         email: user.email,
         birthDate: user.birthDate,
+        role: user.role,   
       },
     });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 /* 로그인 유지용: 내 정보 */
 export const getMe = async (req, res) => {

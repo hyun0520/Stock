@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-
+import "dotenv/config";
 // ===============================
 // ENV
 // ===============================
@@ -20,6 +20,7 @@ import usStockRoutes from "./routes/usStock.js";
 import marketRouter from "./routes/market.js";
 import fxRoutes from "./routes/fx.js";
 import userRoutes from "./routes/user.js";
+import adminRoutes from "./routes/admin.js";
 
 // ===============================
 // App
@@ -60,6 +61,7 @@ app.use("/api/search", searchRoutes);
 app.use("/api/usStock", usStockRoutes);
 app.use("/api/market", marketRouter);
 app.use("/api/fx", fxRoutes);
+app.use("/api/admin", adminRoutes);
 
 // ===============================
 // Health Check

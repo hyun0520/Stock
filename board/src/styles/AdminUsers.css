@@ -1,0 +1,74 @@
+.admin-users {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.admin-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.admin-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table thead th {
+  text-align: left;
+  font-size: 14px;
+  color: #6b7280;
+  padding-bottom: 12px;
+}
+
+.admin-table tbody tr {
+  border-top: 1px solid #e5e7eb;
+}
+
+.admin-table td {
+  padding: 14px 0;
+  font-size: 15px;
+}
+
+.admin-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+/* ===== 권한 배지 ===== */
+.role-badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.role-badge.admin {
+  background: #fde68a;
+  color: #92400e;
+}
+
+.role-badge.user {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.delete-btn:hover {
+  background: red;
+}
+
+/* ===== 로딩 ===== */
+.admin-loading {
+  padding: 40px;
+  text-align: center;
+  font-size: 16px;
+  color: #6b7280;
+}

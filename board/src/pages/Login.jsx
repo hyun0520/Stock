@@ -20,7 +20,7 @@ export default function Login({ setIsAuth }) {
     setMsg("");
 
     try {
-      const res = await api.post("/auth/login", {
+      const res = await api.post("/user/login", {
         email,
         password,
       });

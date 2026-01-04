@@ -96,7 +96,16 @@ export default function StockDetailUS() {
           `/usStock/${symbol}/chart`,
           { params: { range } }
         );
-        return Array.isArray(res.data) ? res.data : [];
+
+        if (!Array.isArray(res.data)) return [];
+
+        // 🔥 AssetActions 전용 포맷으로 변환
+        return res.data
+          .map((d) => ({
+            time: new Date(d.date).getTime(), // XAxis용
+            price: d.close                    // Line용
+          }))
+          .filter((d) => !Number.isNaN(d.time));
       } catch (e) {
         console.error("❌ US chart fetch failed", e);
         return [];

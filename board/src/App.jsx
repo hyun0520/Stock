@@ -14,6 +14,7 @@ import Portfolio from "./pages/Portfolio";
 import CryptoDetail from "./pages/CryptoDetail";
 import StockDetailUS from "./pages/usStockDetail";
 import Help from "./pages/Help";
+import AdminUsers from "./pages/AdminUsers";
 
 function App() {
   const [isAuth, setIsAuth] = useState(
@@ -105,7 +106,10 @@ function App() {
           <Route path="/stock/us/:symbol" element={<StockDetailUS />} />
 
           {/* fallback */}
-          <Route path="*" element={<Navigate to="/" />} />          
+          <Route path="*" element={<Navigate to="/" />} />
+
+          {/* Admin page */}
+          <Route path="/admin/users" element={<AdminUsers />} />
         </Routes>
       </main>
       <Footer />

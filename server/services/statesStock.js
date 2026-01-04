@@ -1,9 +1,12 @@
 import axios from "axios";
 import YahooFinance from "yahoo-finance2";
+import { getCache, setCache } from "../utils/chartCache.js";
 
 const yahooFinance = new YahooFinance();
 const BASE = "https://query1.finance.yahoo.com";
-
+const API_KEY = process.env.ALPHA_VANTAGE_KEY;
+const BASE_URL = "https://www.alphavantage.co/query";
+console.log("DEBUG getCache:", getCache);
 /* ===============================
   미국주식 상세 정보
 =============================== */
@@ -58,82 +61,82 @@ export async function getStockDetail(symbol) {
 }
 
 /* ===============================
-   range -> (period1, period2, interval)
+   🇺🇸 미국 주식 차트 (일봉)
+   - Alpha Vantage
+   - 3시간 캐시
 =============================== */
-function getRangeWindow(range) {
-  const now = new Date();
-  const end = new Date(now);
+// 🔥 미국 주식 차트 (Alpha Vantage)
+export async function getStockChart(symbol, range = "1mo") {
+  const cacheKey = `US_CHART_${symbol}_${range}_ALPHA`;
 
-  let start = new Date(now);
-  let interval = "1d";
-
-  switch (range) {
-    case "1d":
-      start = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000); // 2일 버퍼
-      interval = "5m";
-      break;
-    case "1w":
-      start = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000); // 10일
-      interval = "15m";
-      break;
-    case "1m":
-      start.setMonth(now.getMonth() - 1);
-      interval = "1d";
-      break;
-    case "3m":
-      start.setMonth(now.getMonth() - 3);
-      interval = "1d";
-      break;
-    case "1y":
-      start.setFullYear(now.getFullYear() - 1);
-      interval = "1d";
-      break;
-    case "5y":
-      start.setFullYear(now.getFullYear() - 5);
-      interval = "1wk";
-      break;
-    default:
-      start.setMonth(now.getMonth() - 1);
-      interval = "1d";
-  }
-
-  // yahoo-finance2는 초 단위 timestamp
-  const period1 = Math.floor(start.getTime() / 1000);
-  const period2 = Math.floor(end.getTime() / 1000);
-
-  return { period1, period2, interval };
-}
-
-/* ===============================
-  미국 주식 차트 (v3+ 호환)
-=============================== */
-export async function getStockChart(symbol, range = "1m") {
-  const { period1, period2, interval } = getRangeWindow(range);
+  const cached = getCache(cacheKey);
+  if (cached) return cached;
 
   try {
-    // v3+에서는 period 대신 period1/period2 사용
-    const result = await yahooFinance.chart(symbol, {
-      period1,
-      period2,
-      interval
+    const { data } = await axios.get(BASE_URL, {
+      params: {
+        function: "TIME_SERIES_DAILY",
+        symbol,
+        outputsize: "compact",
+        apikey: API_KEY
+      }
     });
 
-    // 라이브러리 리턴 형태가 다를 수 있어서 둘 다 방어
-    const quotes = result?.quotes || result?.indicators?.quote || [];
-
-    if (Array.isArray(result?.quotes) && result.quotes.length) {
-      return result.quotes
-        .filter((q) => q.close != null && q.date)
-        .map((q) => ({
-          time: new Date(q.date).getTime(),
-          price: Number(q.close)
-        }));
+    // ❗ Alpha Vantage 에러 응답 처리
+    if (data.Note || data["Error Message"]) {
+      console.error("ALPHA VANTAGE ERROR:", data);
+      return [];
     }
 
-    // 혹시 다른 구조면 fallback: query1 직접 호출로 대체 가능
+    const raw = data["Time Series (Daily)"];
+    if (!raw) return [];
+
+    let chart = Object.entries(raw)
+      .map(([date, v]) => ({
+        date,
+        open: +v["1. open"],
+        high: +v["2. high"],
+        low: +v["3. low"],
+        close: +v["4. close"],
+        volume: +v["5. volume"]
+      }))
+      .reverse();
+
+    chart = sliceByRange(chart, range);
+
+    // ✅ 데이터 있을 때만 캐시
+    if (chart.length > 0) {
+      setCache(cacheKey, chart, "1m"); // 3시간
+    }
+
+    return chart;
+  } catch (err) {
+    console.error("getStockChart ERROR:", err.message);
     return [];
-  } catch (e) {
-    console.error("US chart error:", symbol, e.message);
-    return [];
+  }
+}
+
+
+/* ===============================
+   range → 데이터 개수 매핑
+=============================== */
+function sliceByRange(chart, range) {
+  switch (range) {
+    case "1d":
+      return chart.slice(-1);
+    case "5d":
+      return chart.slice(-5);
+    case "1mo":
+      return chart.slice(-22);
+    case "3mo":
+      return chart.slice(-66);
+    case "6mo":
+      return chart.slice(-132);
+    case "1y":
+      return chart.slice(-252);
+    case "5y":
+      return chart.slice(-252 * 5);
+    default:
+      return chart.slice(-60);
   }
 }

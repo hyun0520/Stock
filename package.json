@@ -3,5 +3,9 @@
   "private": true,
   "scripts": {
     "start": "cd server && npm start"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.36.0",
+    "jwt-decode": "^4.0.0"
   }
 }

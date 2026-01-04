@@ -1,6 +1,6 @@
 import axios from "axios";
 import { loadKoreaStocks } from "../utils/loadKoreaStocks.js";
-import { loadKrxDaily } from "../utils/loadKrxDaily.js";
+import { getKoreaStockChart } from "./daumKoreaStockChart.js";
 
 /* ===============================
    검색
@@ -65,4 +65,28 @@ export async function getKoreaStockDetail(symbol) {
     console.error("getKoreaStockDetail error:", e.message);
     return null;
   }
+}
+
+/* ===============================
+   차트 (Daum Finance)
+=============================== */
+export async function getKoreaStockChartData(
+  symbol,
+  range = "1m"
+) {
+  const rangeMap = {
+    "1d": "days",
+    "1w": "weeks",
+    "1m": "months",
+    "3m": "months",
+    "1y": "months",
+    "5y": "months"
+  };
+
+  const daumRange = rangeMap[range] || "months";
+
+  return getKoreaStockChart({
+    symbol,
+    range: daumRange
+  });
 }

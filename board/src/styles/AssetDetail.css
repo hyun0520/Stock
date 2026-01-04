@@ -493,3 +493,41 @@
     max-width: 360px;
   }
 }
+
+/* ===============================
+   🇰🇷 국내주식: 1일 / 1년만 표시
+================================ */
+
+/* 기본: 전부 숨김 */
+.range-tabs[data-market="KOREA"] button {
+  display: none;
+}
+
+/* 1일 */
+.range-tabs[data-market="KOREA"] button:nth-child(1) {
+  display: inline-flex;
+}
+
+/* 1년 */
+.range-tabs[data-market="KOREA"] button:nth-child(5) {
+  display: inline-flex;
+}
+
+/* ===============================
+   🇺🇸 미국주식: 1일 / 1년만 표시
+================================ */
+
+/* 기본: 전부 숨김 */
+.range-tabs[data-market="US"] button {
+  display: none;
+}
+
+/* 1일 */
+.range-tabs[data-market="US"] button:nth-child(1) {
+  display: inline-flex;
+}
+
+/* 1년 */
+.range-tabs[data-market="US"] button:nth-child(5) {
+  display: inline-flex;
+}

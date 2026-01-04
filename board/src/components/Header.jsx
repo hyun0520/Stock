@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import { api } from "../services/api";
 import "../styles/Header.css";
 
 export default function Header({ setIsAuth, isAuth }) {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [searchItems, setSearchItems] = useState([]);
@@ -14,6 +14,20 @@ export default function Header({ setIsAuth, isAuth }) {
   const [activeIndex, setActiveIndex] = useState(-1);
   const listRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  let role = null;
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+      role = decoded.role;
+    } catch (e) {
+      role = null;
+    }
+  }
+
   const handleAuthNavigate = (path) => {
     if (!isAuth) {
       navigate("/login");
@@ -347,6 +361,14 @@ export default function Header({ setIsAuth, isAuth }) {
           <span onClick={() => navigate("/help")}>
             도움말
           </span>
+          {role === "admin" && (
+            <span
+              className="admin-menu"
+              onClick={() => handleAuthNavigate("/admin/users")}
+            >
+              유저관리
+            </span>
+          )}
         </nav>
 
         <div className="header-right desktop-only">
@@ -429,7 +451,11 @@ export default function Header({ setIsAuth, isAuth }) {
           <span onClick={() => handleMenuNavigate("/portfolio")}>포트폴리오</span>
           <span onClick={() => handleMenuNavigate("/help")}>도움말</span>
           <span onClick={() => handleMenuNavigate("/profile")}>내 정보</span>
-
+          {role === "admin" && (
+            <span onClick={() => handleMenuNavigate("/admin/users")}>
+              유저관리
+            </span>
+          )}
           <hr />
 
           {isAuth ? (

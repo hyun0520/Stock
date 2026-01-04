@@ -4,11 +4,13 @@ import {
   getStockChart
 } from "../services/statesStock.js";
 
+console.log("🔥 usStock controller LOADED");
+
 /**
  * 미국주식 상세
- * GET /api/usStock/:symbol
  */
 export async function detail(req, res) {
+  console.log("🔥 detail controller HIT", req.params);
   try {
     const symbol = req.params.symbol.toUpperCase();
     const data = await getStockDetail(symbol);
@@ -26,14 +28,18 @@ export async function detail(req, res) {
 
 /**
  * 미국주식 차트
- * GET /api/usStock/:symbol/chart
  */
 export async function chart(req, res) {
+  console.log("🔥 chart controller HIT", req.params, req.query);
+
   try {
     const symbol = req.params.symbol.toUpperCase();
     const { range = "1mo" } = req.query;
 
+    console.log("🔥 BEFORE getStockChart");
     const data = await getStockChart(symbol, range);
+    console.log("🔥 AFTER getStockChart", Array.isArray(data), data?.length);
+
     res.json(data);
   } catch (err) {
     console.error("US STOCK CHART ERROR:", err.message);

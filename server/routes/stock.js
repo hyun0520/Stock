@@ -2,8 +2,8 @@ import express from "express";
 import {
   searchStock,
   getStockDetail,
+  getKoreaStockChartController
 } from "../controllers/stock.js";
-import { getKoreaStockChartController } from "../controllers/stock.js";
 
 const router = express.Router();
 

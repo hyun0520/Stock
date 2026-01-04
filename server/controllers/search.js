@@ -30,8 +30,8 @@ export const getSearchItems = async (req, res) => {
       )
       .map((m) => ({
         type: "CRYPTO",
-        symbol: m.market,          // KRW-BTC
-        name: m.korean_name        // 비트코인
+        symbol: m.market,          
+        name: m.korean_name        
       }));
 
     results.push(...cryptoResults);
@@ -43,8 +43,8 @@ export const getSearchItems = async (req, res) => {
 
     const krResults = krStocks.map((s) => ({
       type: "KR",
-      symbol: s.symbol,            // 005930
-      name: s.name                 // 삼성전자
+      symbol: s.symbol,           
+      name: s.name                
     }));
 
     results.push(...krResults);
@@ -82,7 +82,7 @@ export const getSearchItems = async (req, res) => {
           )
           .map((q) => ({
             type: "US",
-            symbol: q.symbol,        // TSLA, TSLL
+            symbol: q.symbol,       
             name:
               q.shortname ||
               q.longname ||
@@ -138,7 +138,7 @@ export const getSearchPrices = async (req, res) => {
         `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}`,
         {
           params: {
-            range: "2d",      // 🔥 2일 (등락 계산용)
+            range: "2d",     
             interval: "1d"
           },
           headers: {

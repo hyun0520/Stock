@@ -195,7 +195,7 @@ const formatX = (v) => {
 {/* ================= 차트 ================= */}
       {fetchChart && (
           <section className="asset-chart">
-            <div className="range-tabs">
+            <div className="range-tabs" data-market={market}>
               {RANGES.map((r) => (
                 <button
                   key={r.key}
